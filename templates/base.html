@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Management System</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-gray: #ecf0f1;
+            --text-gray: #7f8c8d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            padding: 100px 40px 40px;
+            color: var(--primary-color);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background-color: var(--accent-color);
+            margin: 10px 0 30px 0; /* Removed auto-centering */
+            width: 450px; /* Or any desired width */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid #eee;
+            font-size: 0.95rem;
+            color: var(--text-gray);
+        }
+
+        tr:hover {
+            background-color: #f2f9ff;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 100px 20px 20px;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            th {
+                display: none;
+            }
+
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                margin-bottom: 10px;
+            }
+
+            td::before {
+                position: absolute;
+                left: 10px;
+                top: 12px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #555;
+            }
+        }
+        </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <h1>Ticket Management System</h1>
+    <hr>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!-- handle_leave_request.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Handle Leave Request(Admin)</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 900px;
+            padding: 40px 50px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: space-between;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .left-panel p {
+            font-size: 16px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .left-panel strong {
+            color: #2c3e50;
+        }
+
+        .right-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #34495e;
+            font-size: 15px;
+        }
+
+        .right-panel textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            resize: vertical;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .right-panel textarea:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[name="action"][value="approve"] {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        button[name="action"][value="approve"]:hover {
+            background-color: #27ae60;
+        }
+
+        button[name="action"][value="reject"] {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        button[name="action"][value="reject"]:hover {
+            background-color: #c0392b;
+        }
+
+        .return-link {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #2980b9;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .return-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your original Back button (unchanged) -->
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+
+    <!-- Main centered container -->
+    <div class="container">
+        <div class="header">Leave Request Review</div>
+
+        <!-- Left panel: leave info -->
+        <div class="left-panel">
+            <p><strong>Employee:</strong> {{ leave.employee.username }}</p>
+            <p><strong>Start Date:</strong> {{ leave.start_date }}</p>
+            <p><strong>End Date:</strong> {{ leave.end_date }}</p>
+            <p><strong>Reason:</strong> {{ leave.reason }}</p>
+            <p><strong>Status:</strong> {{ leave.status }}</p>
+        </div>
+
+        <!-- Right panel: rejection reason + actions -->
+        <div class="right-panel">
+            <form method="post">
+                {% csrf_token %}
+                <label for="rejection_reason">Rejection Reason (if rejecting):</label>
+                <textarea name="rejection_reason" id="rejection_reason" rows="5">{{ leave.rejection_reason }}</textarea>
+
+                <div class="form-actions">
+                    <button type="submit" name="action" value="approve">Approve</button>
+                    <button type="submit" name="action" value="reject">Reject</button>
+                </div>
+            </form>
+
+            <a class="return-link" href="{% url 'manage_leave_requests' %}">&larr; Back to All Requests</a>
+        </div>
+    </div>
+</body>
+</html>

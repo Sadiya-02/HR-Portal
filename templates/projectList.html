@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project List Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .project-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .project-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .project-description {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .add-project-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .add-project-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px 16px;
+    border-radius: 8px;
+    z-index: 1000;
+    ">
+    <a href="javascript:history.back()" style="
+        text-decoration: none;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 16px;
+    ">
+        &larr; Back
+    </a>
+  </div>
+  <div style="height: 60px;"></div>
+    <div class="header">
+        <h1>Projects List</h1>
+        <a href="{% url 'add_project' %}"><button class="add-project-btn">+ New Project</button></a>
+    </div>
+    
+    <div class="projects-container">
+        <!-- Project Card 1 -->
+         {% for project in projects %}
+        <div class="project-card">
+            <h2 class="project-title">{{ project.name}}</h2>
+            <p class="project-description">
+                {{ project.description}}
+            </p>
+            {% if project.uploaded_file %}
+                <a href="{{ project.uploaded_file.url }}" target="_blank"><button>view File</button></a>
+            {% endif %}
+            {% comment %} <button>view File</button> {% endcomment %}
+        </div>
+        {% empty %}
+            <h4>No projects added yet.</h4>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Employee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Styles are same as your original form, omitted here for brevity */
+    body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("{% static 'adm/img/reg.jpeg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  .formbold-main-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); /* dark overlay for readability */
+    padding: 30px;
+  }
+
+  .formbold-form-wrapper {
+    background: rgba(255, 255, 255, 0.25); /* slightly more solid */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 570px;
+    width: 100%;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+  }
+
+  .formbold-form-wrapper h2 {
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .formbold-form-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #f0f0f0;
+    display: block;
+  }
+
+  .formbold-form-input {
+    width: 80%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
+    color: #000;
+    margin-bottom: 18px;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .formbold-form-input::placeholder {
+    color: #555;
+  }
+
+  .formbold-btn {
+    width: 50%;
+    background-color: #ffffff;
+    color: #1d3d88;
+    font-size: 16px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    margin-left: 130px;
+  }
+
+  .formbold-btn:hover {
+    background-color: #eaeaea;
+  }
+  .message-success {
+    color: green;
+  }
+  .message-error {
+    color: red;
+  }
+  </style>
+</head>
+<body>
+  <div class="formbold-main-wrapper">
+    <!-- BACK BUTTON inside .formbold-main-wrapper -->
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+
+    <div class="formbold-form-wrapper">
+      
+      {% if messages %}
+        <div class="message-box">
+          {% for messages in messages %}
+          <div class="message-{{ message.tags}}">
+            {{ message}}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <form method="POST" action="{% url 'add_employee' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2 style="margin-bottom: 20px; color:#07074d;">Register New Employee</h2>
+
+        <label class="formbold-form-label" for="username">Username</label>
+        <input class="formbold-form-input" type="text" id="username" name="username" required>
+
+        <label class="formbold-form-label" for="password">Password</label>
+        <input class="formbold-form-input" type="password" id="password" name="password" required>
+
+        <label class="formbold-form-label" for="firstname">First Name</label>
+        <input class="formbold-form-input" type="text" id="firstname" name="firstname" required>
+
+        <label class="formbold-form-label" for="lastname">Last Name</label>
+        <input class="formbold-form-input" type="text" id="lastname" name="lastname" required>
+
+        <label class="formbold-form-label" for="email">Email</label>
+        <input class="formbold-form-input" type="email" id="email" name="email" required>
+
+        <label class="formbold-form-label" for="phone">Phone Number</label>
+        <input class="formbold-form-input" type="text" id="phone" name="phone">
+
+        <label class="formbold-form-label" for="designation">Designation</label>
+        <input class="formbold-form-input" type="text" id="designation" name="designation">
+
+        <label class="formbold-form-label" for="date_of_joining">Date of Joining</label>
+        <input class="formbold-form-input" type="date" id="date_of_joining" name="date_of_joining">
+
+        <label class="formbold-form-label" for="image">Profile Image</label>
+        <input class="formbold-form-input" type="file" id="image" name="image">
+        <button class="formbold-btn" type="submit">Register Now</button>
+      
+      </form>
+    </div>
+  </div>
+</body>
+</html>
+

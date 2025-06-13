@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Tasks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f3;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .task {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .task p {
+            margin: 5px 0;
+        }
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-completed {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+<div class="container">
+    {% if not user.is_superuser %}
+    <h2>My Assigned Tasks</h2>
+    {% else %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Tasks</h2>
+        <a href="{% url 'assign-task' %}" style="text-decoration: none;">
+            <button style="padding: 6px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Create New Task
+            </button>
+        </a>
+    </div>
+    {% endif%}
+    {% if tasks %}
+        {% for task in tasks %}
+        <div class="task">
+            <p><strong>Project:</strong> {{ task.project.name }}</p>
+            <p><strong>Description:</strong> {{ task.description }}</p>
+            <p><strong>Submission Date:</strong> {{ task.submission_date }}</p>
+            <p><strong>Status:</strong> 
+                {% if task.completed %}
+                    <span class="status-completed">Completed</span>
+                {% else %}
+                    <span class="status-pending">Pending</span>
+                    {% if not user.is_superuser %}
+                    <br>
+                    <br>
+                    <form method="post" id="task-form" action="{% url 'update_task_status' %}">
+                        {% csrf_token %}
+                        <input type="checkbox" id="task_check" name="task_check" class="form-control" {% if task.completed %}checked{% endif %}>
+                        <label>Mark Completed</label>
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                    </form>
+                    {% endif %}
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No tasks assigned yet.</p>
+    {% endif %}
+</div>
+</body>
+<script>
+document.getElementById('task_check').addEventListener('change', function() {
+    if (this.checked) {
+        if (confirm('Is the task completed?')) {
+            document.getElementById('task-form').submit();
+        } else {
+            this.checked = false;
+        }
+    } else {
+        document.getElementById('task-form').submit();
+    }
+});
+</script>
+
+</html>

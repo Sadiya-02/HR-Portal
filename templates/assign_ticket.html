@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Assign Ticket #{{ ticket.id }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="id_assigned_employee">Select Employee:</label><br>
+    {{ form.assigned_employee }}<br><br>
+
+    <button type="submit">Assign</button>
+</form>
+{% endblock %}

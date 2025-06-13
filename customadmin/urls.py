@@ -1,0 +1,48 @@
+from django.urls import path
+from.import views
+from .views import *
+from django.contrib.auth import views as auth_views
+
+urlpatterns=[
+    path('',admin_login,name='admin_login'),
+    path('logout/',logoutPage,name='logoutpage'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('register/', views.register, name='register'),
+    # path('password_reset/', views.password_reset, name='password_reset'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('add_employee/', views.add_employee, name='add_employee'),
+    # path('assign-project/', views.assign_project, name='assign-project'),
+    path('admin/todo/', views.todo_list, name='todo_list'),
+    path('admin/toggle/<int:task_id>/', views.toggle_task, name='toggle_todo'),
+    path('admin/delete/<int:task_id>/', views.delete_task, name='delete_task'),
+    path('add-project/', add_project, name='add_project'),
+    path('add-event/', views.add_event, name='add_event'),
+    path('edit-event/<int:event_id>/', views.edit_event, name='edit_event'),
+    path('delete-event/<int:event_id>/', views.delete_event, name='delete_event'),
+    path('email/',views.email_view,name='email'),
+    path('see-employees/', views.see_employees, name='see_employees'),
+    path('admin/attendance/', views.attendance_list, name='attendance_list'),
+    path('add-client/', views.add_client, name='add_client'),
+    path('admin/view-tickets/', views.admin_view_tickets, name='admin_view_tickets'),
+    path('assign-ticket/<int:ticket_id>/', views.assign_ticket, name='assign_ticket'),
+    path('admin/forward-solution/<int:ticket_id>/', views.forward_solution_to_client, name='forward_solution'),
+    path('tickets/', views.view_tickets, name='view_tickets'),
+    path('projects/', views.admin_project_list, name='admin_project_list'),
+    path('edit-project/<int:project_id>/', views.edit_client_project, name='edit_client_project'),
+    path('notifications/', views.notifications_view, name='notifications'),
+    path('leave-requests/', manage_leave_requests, name='manage_leave_requests'),
+    path('leave-requests/<int:leave_id>/', handle_leave_request, name='handle_leave_request'),
+    path('assign-task/', views.assign_task, name='assign-task'),
+    path('update-task-status/', views.update_task_status, name='update_task_status'),
+    path('admin-projects/', views.adminprojects, name='projectList'),
+    path('add-estimate/', views.add_estimate, name='add_estimate'),
+    path('view-estimates/', views.view_estimates, name='view_estimates'),
+    path('estimate/<int:estimate_id>/review/', views.estimate_review, name='estimate_review'),
+    path('upload-invoice/', views.upload_invoice, name='upload_invoice'),
+    path('all-invoices/', views.view_all_invoices_admin, name='view_all_invoices_admin'),
+    path('see-clients/', views.see_clients, name='see_clients'),
+]
+

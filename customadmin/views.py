@@ -1,0 +1,482 @@
+from django.http import HttpResponseRedirect
+from django.shortcuts import render,redirect,get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,login,logout 
+from django.contrib import messages
+from employee.forms import EmployeeForm  # Adjust the import path if needed
+from employee.models import Employee,Event,Project,LeaveRequest,Task 
+from client.forms import ProjectForm
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import Todo
+from .models import Attendance
+from client.models import Client
+from .forms import AddClientForm
+from customadmin.models import Ticket, EmployeeSolution
+from customadmin.forms import AssignTicketForm
+from django.contrib.auth.decorators import login_required
+from client.models import ClientProject, Notification
+from .forms import TaskAssignForm
+from django.http import HttpResponse
+from .forms import EstimateForm,InvoiceForm
+from .models import Estimate,Invoice
+
+# Create your views here.
+
+def dashboard(request):
+    return render(request,'dashboard.html')
+
+def admin_login(request):
+    try:
+        if request.user.is_authenticated:
+            return redirect('dashboard/')
+        
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user_obj = User.objects.filter(username = username)
+            if not user_obj.exists ():
+                messages.info(request, 'Account not found')
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            
+            user_obj = authenticate(username = username, password = password)
+
+            if user_obj and user_obj.is_superuser:
+                login(request, user_obj)
+                return redirect('dashboard/')
+            
+            messages.info(request, 'Invalid Password')
+            return redirect('/')
+        
+        return render(request, 'login.html')
+    
+    except Exception as e:
+        print(e)
+
+
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already taken.')
+        else:
+            user = User.objects.create_user(username=username, password=password)
+            user.is_staff = False  # Prevent access to Django admin
+            user.save()
+            messages.success(request, 'Registration successful. You can now log in.')
+            return redirect('employee_login')  # Make sure this matches your URL name
+
+    return render(request, 'add_employee.html')
+
+# def password_reset(request):
+#     return render('login.html')
+
+def add_employee(request):
+    if request.method == 'POST':
+        # Extract form data
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        first_name = request.POST.get('firstname')
+        last_name = request.POST.get('lastname')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        designation = request.POST.get('designation')
+        date_of_joining = request.POST.get('date_of_joining')
+        image = request.FILES.get('image')  # ✅ This line is important
+
+        try:
+            # Check if username already exists
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Username already taken. Please choose another.")
+                return redirect('add_employee')
+
+            # Create User
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                email=email
+            )
+
+            # Create Employee record
+            employee = Employee.objects.create(
+                user=user,
+                phone=phone,
+                designation=designation,
+                date_of_joining=date_of_joining)
+            if image:
+                employee.image=image  # ✅ Assign image here
+                employee.save()
+            else:
+                messages.error("couldn't Upload profile pic of employee")
+            messages.success(request, "Employee registered successfully!")
+        except Exception as e:
+            messages.error(request, f"Something went wrong: {str(e)}")
+
+        return redirect('add_employee')  # Redirect to clear POST data and show message
+
+    return render(request, 'add_employee.html')
+
+
+# def admin_add_task(request):
+#     if request.method == 'POST':
+#         form = TaskForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('add_task')  # or your dashboard
+#     else:
+#         form = TaskForm()
+#     return render(request, 'add_task.html', {'form': form})
+
+# def assign_project(request):
+#     if request.method == 'POST':
+#         form = ProjectAssignForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('assign-project')  # or redirect to a success page
+#     else:
+#         form = ProjectAssignForm()
+#     return render(request, 'customadmin/assign_project.html', {'form': form})
+
+
+def todo_list(request):
+    todos = Todo.objects.all()  # Use "todos" to match context in template
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        if title:
+            Todo.objects.create(title=title)
+        return redirect('todo_list')
+    return render(request, 'todo_adm.html', {'todos': todos})
+
+def toggle_task(request, task_id):
+    todo = Todo.objects.get(id=task_id)
+    todo.completed = not todo.completed
+    todo.save()
+    return redirect('todo_list')
+
+def delete_task(request, task_id):
+    Todo.objects.get(id=task_id).delete()
+    return redirect('todo_list')
+
+
+# def add_project(request):
+#     if request.method == 'POST':
+#         name = request.POST.get('name')
+#         description = request.POST.get('description')
+#         employee_id = request.POST.get('employee')  # employee id from form
+#         start_date = request.POST.get('start_date')
+#         end_date = request.POST.get('end_date')
+#         uploaded_file = request.FILES.get('project_file')
+#         assigned_to = Employee.objects.get(id=assigned_to_id)
+
+#         try:
+#             employee = User.objects.get(id=employee_id)
+#             Project.objects.create(name=name, description=description, assigned_to=employee,end_date=end_date,start_date=start_date)
+#             return redirect('add_project')  # Redirect to the same page or a success page
+#         except User.DoesNotExist:
+#             # Handle the case where the employee does not exist
+#             return render(request, 'add_project.html', {'employees': User.objects.all(), 'error': 'Employee not found.'})
+#     employees = Employee.objects.all()
+#     return render(request, 'add_project.html', {'employees': employees})
+
+def add_project(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        employee_id = request.POST.get('employee')  # ID from the form
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        uploaded_file = request.FILES.get('project_file')  # 👈 file handling
+
+        try:
+            assigned_to = Employee.objects.get(id=employee_id)
+
+            Project.objects.create(
+                name=name,
+                description=description,
+                assigned_to=assigned_to,
+                start_date=start_date,
+                end_date=end_date,
+                uploaded_file=uploaded_file  # 👈 saving the file (or None if not provided)
+            )
+            return redirect('add_project')  # redirect after successful submission
+
+        except Employee.DoesNotExist:
+            return render(request, 'add_project.html', {
+                'employees': Employee.objects.all(),
+                'error': 'Employee not found.'
+            })
+
+    employees = Employee.objects.all()
+    return render(request, 'add_project.html', {'employees': employees})
+
+def add_event(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        date = request.POST.get("date")
+
+        Event.objects.create(title=title, description=description, date=date)
+        messages.success(request, "Event added successfully.")
+        return redirect("add_event")
+
+    events = Event.objects.all().order_by('-created_at')  # Admin also sees all events
+    return render(request, "add_event.html", {"events": events})
+
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        event.title = request.POST.get('title')
+        event.description = request.POST.get('description')
+        event.date = request.POST.get('date')
+        event.time = request.POST.get('time')
+        event.location = request.POST.get('location')
+        event.save()
+        messages.success(request, "Event updated successfully.")
+        return redirect('add_event')
+
+    return render(request, 'edit_event.html', {'event': event})
+
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    messages.success(request, "Event deleted successfully.")
+    return redirect('add_event')
+
+def email_view(request):
+    return render(request,'email.html')
+
+def see_employees(request):
+    employees = Employee.objects.all()
+    return render(request, 'see_employees.html', {'employees': employees})
+
+def see_clients(request):
+    clients = Client.objects.all()
+    return render(request, 'see_client.html', {'clients': clients})
+
+@staff_member_required
+def attendance_list(request):
+    attendance_records = Attendance.objects.select_related('user').order_by('-date')
+    return render(request, 'attendance_list.html', {'attendance_records': attendance_records})
+
+
+def add_client(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        profile_image = request.FILES.get('profile_image')
+        company_name = request.POST.get('company_name')  # New
+        company_description = request.POST.get('company_description')  # New
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect('add_client')
+
+        try:
+            user = User.objects.create_user(username=username, password=password, email=email)
+            # 
+            Client.objects.create(
+                user=user,
+                profile_image=profile_image,
+                company_name=company_name,
+                company_description=company_description
+            )
+
+            messages.success(request, "Client added successfully.")
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+            return redirect('add_client')
+
+        return redirect('add_client')
+
+    return render(request, 'add_client.html')
+
+def logoutPage(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request,"Logged Out Successfully")
+        return redirect('/')
+    return redirect('/')
+
+@login_required
+def admin_view_tickets(request):
+    tickets = Ticket.objects.all()
+    return render(request, 'view_ticketsadmin.html', {'tickets': tickets})
+
+@login_required
+def assign_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    if request.method == 'POST':
+        form = AssignTicketForm(request.POST, instance=ticket)
+        if form.is_valid():
+            ticket.status = 'Assigned'
+            form.save()
+            return redirect('view_tickets')
+    else:
+        form = AssignTicketForm(instance=ticket)
+    return render(request, 'assign_ticket.html', {'form': form, 'ticket': ticket})
+    
+@login_required
+def forward_solution_to_client(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    solution = get_object_or_404(EmployeeSolution, ticket=ticket)
+    ticket.client_notification = f"Ticket successfully cleared. Message: {solution.message}"
+    ticket.save()
+    return redirect('admin_view_tickets')
+
+def view_tickets(request):
+    tickets = Ticket.objects.all()
+    return render(request, 'view_tickets.html', {'tickets': tickets})
+
+
+def admin_project_list(request):
+    projects = ClientProject.objects.all().order_by('-created_at')
+    return render(request, 'client_project_list.html', {'projects': projects})
+
+def notifications_view(request):
+    notifications = Notification.objects.filter(is_seen=False).order_by('-created_at')
+    return render(request, 'notifications.html', {'notifications': notifications})
+
+
+def edit_client_project(request, project_id):
+    # Get the project or return 404 if not found
+    project = get_object_or_404(ClientProject, id=project_id)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES, instance=project) # pre-populate proj info
+        if form.is_valid():
+            print(form.data)
+            updated_project = form.save()
+            print(updated_project.status)
+            Notification.objects.create(
+                message=f"Project updated: {updated_project.title}",
+                project=updated_project
+            )
+            return redirect('admin_project_list')  
+    else:
+        form = ProjectForm(instance=project)  # pre-populate proj info
+        return render(request, 'client_add_project.html', {'form': form})
+    
+    return redirect('admin_project_list')
+
+def manage_leave_requests(request):
+    requests = LeaveRequest.objects.all()
+    return render(request, 'manage_leave_requests.html', {'requests': requests})
+
+def handle_leave_request(request, leave_id):
+    leave = get_object_or_404(LeaveRequest, id=leave_id)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'approve':
+            leave.status = 'Approved'
+            leave.rejection_reason = ''
+            leave.save()
+            Notification.objects.create(
+                user=leave.employee,
+                message="Your leave request has been approved.",
+                project=None
+            )
+        elif action == 'reject':
+            leave.status = 'Rejected'
+            leave.rejection_reason = request.POST.get('rejection_reason', '')
+            leave.save()
+            Notification.objects.create(
+                user=leave.employee,
+                message=f"Your leave request has been rejected. Reason: {leave.rejection_reason}",
+                project=None
+            )
+        # Notification to admin
+        Notification.objects.create(
+            user=request.user,
+            message=f"You {'approved' if action == 'approve' else 'rejected'} a leave request.",
+            project=None
+        )
+        return redirect('manage_leave_requests')
+    return render(request, 'handle_leave_request.html', {'leave': leave})
+
+
+def assign_task(request):
+    if request.method == 'POST':
+        form = TaskAssignForm(request.POST)
+        if form.is_valid():
+            task = form.save()
+            Notification.objects.create(
+                user=task.assigned_to,
+                message=f"You have been assigned a new task for project: {task.project.name}"
+            )
+            Notification.objects.create(
+                user=request.user,
+                message=f"Task assigned to {task.assigned_to.username} successfully."
+            )
+            return redirect('assign-task')
+    else:
+        form = TaskAssignForm()
+    return render(request, 'assign_task.html', {'form': form})
+
+
+def update_task_status(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task_id')
+        task = get_object_or_404(Task, id=task_id)
+        
+        # Check if the checkbox was checked or unchecked
+        if 'task_check' in request.POST:
+            task.completed = True
+            messages.success(request, 'Task marked as completed!')
+            task.save()
+        return redirect('my-tasks') 
+    
+def adminprojects(request):
+    if request.user.is_superuser :
+        projects = Project.objects.all()
+        return render(request, 'projectList.html', {'projects': projects})
+    else :
+        return HttpResponse("You are not linked to an admin.")
+
+@login_required
+def add_estimate(request):
+    if request.method == 'POST':
+        form = EstimateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('view_estimates')
+    else:
+        form = EstimateForm()
+    return render(request, 'adm_add_estimate.html', {'form': form})
+
+@login_required
+def view_estimates(request):
+    estimates = Estimate.objects.all()
+    return render(request, 'adm_view_estimates.html', {'estimates': estimates})
+
+@login_required
+def estimate_review(request, estimate_id):
+    estimate = get_object_or_404(Estimate, id=estimate_id)
+    return render(request, 'adm_estimate_review.html', {'estimate': estimate})
+
+@login_required
+def upload_invoice(request):
+    invoices = Invoice.objects.all()
+    
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('upload_invoice')
+    else:
+        form = InvoiceForm()
+    
+    return render(request, 'adm_upload_invoice.html', {'form': form, 'invoices': invoices})
+
+
+@login_required
+def view_all_invoices_admin(request):
+    invoices = Invoice.objects.all()
+    return render(request, 'adm_all_invoices.html', {'invoices': invoices})

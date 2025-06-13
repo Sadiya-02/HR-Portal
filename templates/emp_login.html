@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Login</title>
+    <style>
+        body {
+            background: url("{% static 'adm/img/log.jpeg' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.2); /* semi-transparent white */
+            backdrop-filter: blur(10px); /* frosted glass effect */
+            -webkit-backdrop-filter: blur(10px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            color: #fff;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color:black;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            color:#fff;
+        }
+
+        input::placeholder {
+            color: #f0f0f0;
+        }
+
+        input:focus {
+            border: 1px solid #fff;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2575fc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1a5cd8;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="login-container">
+        <h2 style="color: black;">Employee Login</h2>
+        {% if messages %}
+            {% for messages in messages %}
+                <p style="color:red">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <label>Username:</label><br>
+            <input type="text" name="username" required><br><br>
+            <label>Password:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>

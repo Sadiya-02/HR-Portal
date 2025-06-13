@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Assigned Tickets</h2>
+<table>
+    <tr>
+        <th>Project</th>
+        <th>Description</th>
+        <th>Action</th>
+    </tr>
+    {% for ticket in tickets %}
+    <tr>
+        <td>{{ ticket.subject }}</td>
+        <td>{{ ticket.description }}</td>
+        <td>
+            <a href="{% url 'solve_ticket' ticket.id %}">Solve</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

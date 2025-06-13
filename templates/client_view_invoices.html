@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Invoices</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            color: #333;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td a {
+            padding: 6px 12px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        td a:hover {
+            background-color: #1e7e34;
+        }
+
+        .empty {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        display: inline-block;
+    ">
+    <a href="javascript:history.back()" style="
+        text-decoration: none;
+        color: #3498db;
+        font-weight: bold;
+        font-size: 16px;
+    ">
+        &larr; Back
+    </a>
+    </div>
+    <div class="container">
+        <h2>My Invoices</h2>
+
+        {% if invoices %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Uploaded Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.title }}</td>
+                            <td>{{ invoice.uploaded_at|date:"F d, Y" }}</td>
+                            <td><a href="{{ invoice.file.url }}" target="_blank">View</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty">No invoices available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

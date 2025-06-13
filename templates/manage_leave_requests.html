@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Leave Requests (Admin)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            padding: 40px 50px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .top-action {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-action a button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .top-action a button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead {
+            background-color: #3498db;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        table tbody tr:hover {
+            background-color: #f2f9fc;
+        }
+
+        a.review-link {
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        a.review-link:hover {
+            background-color: #27ae60;
+        }
+
+        .no-data {
+            text-align: center;
+            font-size: 16px;
+            color: #777;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container">
+        <h2>All Leave Requests</h2>
+
+        {% if not user.is_superuser %}
+        <div class="top-action">
+            <a href="{% url 'leave_request'%}">
+                <button>Create New Leave Request</button>
+            </a>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    {% if user.is_superuser %}
+                    <th>Employee</th>
+                    {% endif %}
+                    <th>Dates</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    {% if user.is_superuser %}
+                    <th>Action</th>
+                    {% else %}
+                    <th>Rejection Reason / Info</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in requests %}
+                    <tr>
+                        {% if user.is_superuser %}
+                            <td>{{ leave.employee.username }}</td>
+                        {% endif %}
+                        <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                        <td>{{ leave.submitted_at }}</td>
+                        <td>{{ leave.status }}</td>
+                        {% if user.is_superuser %}
+                            <td>
+                                <a class="review-link" href="{% url 'handle_leave_request' leave.id %}">Review</a>
+                            </td>
+                        {% else %}
+                            {% if leave.status == "Rejected" %}
+                                {% if leave.status is not None %}
+                                    <td>{{ leave.rejection_reason }}</td>
+                                {% else %}
+                                    <td>No reason provided for rejection</td>
+                                {% endif %}
+                            {% elif leave.status == "Approved" %}
+                                <td>Your Leave Application Approved</td>
+                            {% elif leave.status == "Pending" %}
+                                <td>Your Leave Application is Pending</td>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="no-data">No leave requests found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

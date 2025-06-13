@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Company Events</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            background: url("{% static 'adm/img/event.jpeg' %}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #ecf0f1;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3498db;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        li:hover {
+            transform: translateX(5px);
+            background: #d6eaf8;
+        }
+
+        strong {
+            display: block;
+            font-size: 1.2em;
+            color: #34495e;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container">
+        <h2>Company Events</h2>
+
+        <h3 class="section-title">Upcoming Events</h3>
+        <ul>
+            {% for event in upcoming_events %}
+                <li>
+                    <strong>{{ event.title }}</strong>
+                    <div class="event-date">{{ event.date }}{% if event.time %} at {{ event.time|time:"H:i A" }}{% endif %}</div>
+                    <div>{{ event.description }}</div>
+                </li>
+            {% empty %}
+                <li class="empty-message">No upcoming events.</li>
+            {% endfor %}
+        </ul>
+
+        <h3 class="section-title">Past Events</h3>
+        <ul>
+            {% for event in past_events %}
+                <li>
+                    <strong>{{ event.title }}</strong>
+                    <div class="event-date">{{ event.date }}{% if event.time %} at {{ event.time|time:"H:i A" }}{% endif %}</div>
+                    <div>{{ event.description }}</div>
+                </li>
+            {% empty %}
+                <li class="empty-message">No past events.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

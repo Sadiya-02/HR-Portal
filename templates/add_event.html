@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Event</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 40px;
+            background-color: #f5f7fa;
+        }
+        h2 {
+            color: #333;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 18px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .message {
+            color: green;
+            font-weight: bold;
+        }
+        .event {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+            border-radius: 6px;
+        }
+        .event a {
+            margin-right: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        display: inline-block;
+    ">
+    <a href="javascript:history.back()" style="
+        text-decoration: none;
+        color: #3498db;
+        font-weight: bold;
+        font-size: 16px;
+    ">
+        &larr; Back
+    </a>
+    </div>
+    <h2>Add New Event</h2>
+    {% if message %}
+        {% for meassage in messages %}
+            <p class="meassage">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="title">Event Title:</label>
+        <input type="text" name="title" required>
+
+        <label for="description">Description:</label>
+        <textarea name="description"></textarea>
+
+        <label for="date">Date:</label>
+        <input type="date" name="date" required>
+
+        <label for="time">Time:</label>
+        <input type="time" name="time" required>
+
+        <label for="location">Location:</label>
+        <input type="text" name="location">
+
+        <button type="submit">Add Event</button>
+    </form>
+
+    <h2> All Events </h2>
+    {% if events %}
+        {% for event in events %}
+        <div class="event">
+            <strong>{{ event.title }}</strong><br>
+            {{ event.date }} at {{ event.time }}
+            {{ event.description }}<br>
+            {% if event.location %}<em>Location:</em> {{ event.location }}<br>{% endif %}
+            <a href="{% url 'edit_event' event.id %}">Edit</a>
+                <a href="{% url 'delete_event' event.id %}" onclick="return confirm('Delete this event?');">Delete</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No events found.</p>
+    {% endif %}
+</body>
+</html>
+        

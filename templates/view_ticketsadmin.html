@@ -1,0 +1,31 @@
+<!-- view the ticket raised to admin  -->
+{% extends "base.html" %} 
+{% block content %}
+<h2>All Tickets</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Client</th>
+        <th>Subject</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    {% for ticket in tickets %}
+    <tr>
+        <td>{{ ticket.id }}</td>
+        <td>{{ ticket.client.username }}</td>
+        <td>{{ ticket.subject }}</td>
+        <td>{{ ticket.status }}</td>
+        <td>
+            {% if ticket.status == 'Assigned' %}
+                <a href="{% url 'assign_ticket' ticket.id %}">Assign</a>
+            {% elif ticket.status == 'Solved' and not ticket.client_notification %}
+                <a href="{% url 'forward_solution' ticket.id %}">Send to Client</a>
+            {% else %}
+                <a href="{% url 'assign_ticket' ticket.id %}">Assign</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

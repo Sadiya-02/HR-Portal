@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 50px 20px;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 40px 30px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: 600;
+            color: #444;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+        .form-control:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+        .btn-primary {
+            background-color: #4a90e2;
+            border-color: #4a90e2;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container">
+        <h2 class="mb-4">Submit a New Project</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% comment %} <div class="mb-3">
+                <label for="id_title" class="form-label">Title</label>
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                <label for="id_description" class="form-label">Description</label>
+                {{ form.description }}
+            </div>
+            <div class="mb-3">
+                <label for="id_file" class="form-label">Upload File</label>
+                {{ form.file }}
+            </div> {% endcomment %}
+            <button type="submit" class="btn btn-primary">Submit Project</button>
+        </form>
+    </div>
+</body>
+</html>

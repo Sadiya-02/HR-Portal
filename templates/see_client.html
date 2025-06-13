@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registered Clients</title>
+    <style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f7fa;
+        padding: 40px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 70%;
+        margin: auto;
+        border-collapse: collapse;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 14px 20px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    td:last-child {
+        text-transform: capitalize;
+    }
+</style>
+</head>
+<body>
+    <h1>Registered Clients</h1>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Company</th>
+        </tr>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.user }}</td>
+            <td>{{ client.company_name }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No Clients registered.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

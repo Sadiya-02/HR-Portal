@@ -1,0 +1,124 @@
+<!-- attendance_list.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Records</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding: 40px;
+            margin: 0;
+            background-image: url("{% static 'adm/img/att.jpg'%}");
+            background-size: cover;
+        }
+
+        h2 {
+            text-align: center;
+            color:white;
+        }
+
+        table {
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background-color: #007bff;
+            color:white;
+        }
+
+        th, td {
+            padding: 14px 20px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            th, td {
+                text-align: right;
+                padding: 10px;
+                position: relative;
+            }
+
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <h2>Employee Attendance Records</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Date</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in attendance_records %}
+            <tr>
+                <td>{{ record.user.username }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.check_in|default:"-" }}</td>
+                <td>{{ record.check_out|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

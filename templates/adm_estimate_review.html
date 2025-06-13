@@ -1,0 +1,82 @@
+<!-- templates/customadmin/estimate_review.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Estimate Review</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #222;
+        }
+
+        h4 {
+            margin-top: 40px;
+            font-weight: bold;
+        }
+
+        embed {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-top: 15px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-5">
+    <div style="
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        display: inline-block;
+    ">
+    <a href="javascript:history.back()" style="
+        text-decoration: none;
+        color: #3498db;
+        font-weight: bold;
+        font-size: 16px;
+    ">
+        &larr; Back
+    </a>
+    </div>
+    <div class="container">
+        <h2>Estimate Review</h2>
+        <p><strong>Status:</strong> {{ estimate.status }}</p>
+        <p><strong>Uploaded At:</strong> {{ estimate.uploaded_at }}</p>
+        <p><strong>Reviewed At:</strong> {{ estimate.reviewed_at|default:"Not yet reviewed" }}</p>
+
+        {% if estimate.status == 'rejected' %}
+            <p><strong>Rejection Reason:</strong> {{ estimate.rejection_reason }}</p>
+        {% endif %}
+
+        <h4 class="mt-4">Estimate File:</h4>
+        <embed src="{{ estimate.file.url }}" width="100%" height="500px" type="application/pdf">
+    </div>
+</body>
+</html>

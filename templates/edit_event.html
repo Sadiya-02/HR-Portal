@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Event(Admin)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 40px;
+            background-color: #f0f2f5;
+        }
+        form {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #444;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color:#f0f2f5;
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: black;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    
+    <h2>Edit Event</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        <label for="title">Event Title:</label>
+        <input type="text" name="title" value="{{ event.title }}" required>
+
+        <label for="description">Description:</label>
+        <textarea name="description">{{ event.description }}</textarea>
+
+        <label for="date">Date:</label>
+        <input type="date" name="date" value="{{ event.date }}" required>
+
+        <label for="time">Time:</label>
+        <input type="time" name="time" value="{{ event.time }}" required>
+
+        <label for="location">Location:</label>
+        <input type="text" name="location" value="{{ event.location }}">
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <a href="{% url 'add_event' %}">← Back to Event List</a>
+</body>
+</html>

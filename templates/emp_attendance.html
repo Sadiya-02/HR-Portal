@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Attendance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url("{% static 'adm/img/att1.jpeg' %}") no-repeat center center fixed;
+            background-size: cover;
+            padding: 40px;
+            color: #333;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .checked-in, .checked-out, .not-checked-in {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .checked-in { color: green; }
+        .checked-out { color: orange; }
+        .not-checked-in { color: red; }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container">
+        <h1>Attendance Portal</h1>
+
+        <div class="status">
+            {% if attendance %}
+                <p class="checked-in">✅ Checked in at: {{ attendance.check_in }}</p>
+                {% if attendance.check_out %}
+                    <p class="checked-out">⏱️ Checked out at: {{ attendance.check_out }}</p>
+                {% else %}
+                    <p class="not-checked-in">🔴 You have not checked out yet.</p>
+                {% endif %}
+            {% else %}
+                <!-- <p class="not-checked-in">🟡 You have not checked in today.</p> -->
+            {% endif %}
+        </div>
+
+        <div class="buttons">
+            <form method="post" action="{% url 'check_in' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">✅ Check In</button>
+            </form>
+
+            <form method="post" action="{% url 'check_out' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">⏱️ Check Out</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
