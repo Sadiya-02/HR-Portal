@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .report-section {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef;
+        }
+        .no-data {
+            color: #6c757d;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+        .section-title {
+            color: #343a40;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .month-name {
+            color: #495057;
+            font-weight: bold;
+        }
+        .current-month-badge {
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        .month-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        .month-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .month-selector select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
+        .month-selector button {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .month-selector button:hover {
+            background: #0069d9;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container">
+        <h1>Attendance History for {{ current_user.username }}</h1>
+        
+        <!-- Month Selector -->
+        <div class="month-selector">
+            <form method="get" action="">
+                <label for="selected_month">Select Month:</label>
+                <select id="selected_month" name="month">
+                    <option value="">All Months</option>
+                    {% for month in all_available_months %}
+                        <option value="{{ month|date:'Y-m' }}" 
+                            {% if selected_month == month|date:'Y-m' %}selected{% endif %}>
+                            {{ month|date:"F Y" }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">View</button>
+            </form>
+        </div>
+        
+        <!-- Weekly Report (only shown when viewing current month or all months) -->
+        {% if not selected_month or selected_month == current_month|date:'Y-m' %}
+        <div class="report-section">
+            <h2 class="section-title">
+                <span>This Week ({{ week_start|date:"M d" }} - {{ today|date:"M d" }})</span>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if weekly_attendances %}
+                        {% for record in weekly_attendances %}
+                        <tr>
+                            <td>{{ record.date|date:"D, M d" }}</td>
+                            <td>{{ record.check_in|default:"-" }}</td>
+                            <td>{{ record.check_out|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="no-data">No records this week</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <!-- Monthly Reports -->
+        {% for month in monthly_data %}
+            {% if not selected_month or selected_month == month.month_start|date:'Y-m' %}
+            <div class="report-section">
+                <h2 class="section-title month-toggle" onclick="toggleMonth('month-{{ forloop.counter }}')">
+                    <span class="month-name">{{ month.month_name }}</span>
+                    {% if month.is_current %}<span class="current-month-badge">Current</span>{% endif %}
+                </h2>
+                <div id="month-{{ forloop.counter }}" {% if selected_month %}style="display: block;"{% endif %}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if month.attendances %}
+                                {% for record in month.attendances %}
+                                <tr>
+                                    <td>{{ record.date|date:"D, M d" }}</td>
+                                    <td>{{ record.check_in|default:"-" }}</td>
+                                    <td>{{ record.check_out|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="no-data">No records for this month</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <script>
+        function toggleMonth(monthId) {
+            const monthDiv = document.getElementById(monthId);
+            if (monthDiv.style.display === 'none') {
+                monthDiv.style.display = 'block';
+            } else {
+                monthDiv.style.display = 'none';
+            }
+        }
+        
+        // Only collapse months if we're viewing all months
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedMonth = urlParams.get('month');
+            
+            if (!selectedMonth) {
+                const months = document.querySelectorAll('[id^="month-"]');
+                months.forEach(month => {
+                    if (!month.closest('.report-section').querySelector('.current-month-badge')) {
+                        month.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

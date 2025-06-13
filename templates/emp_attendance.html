@@ -85,6 +85,7 @@
         <h1>Attendance Portal</h1>
 
         <div class="status">
+            <a href="{% url 'attendance_report'%}"><button>Attendence Report</button></a>
             {% if attendance %}
                 <p class="checked-in">✅ Checked in at: {{ attendance.check_in }}</p>
                 {% if attendance.check_out %}

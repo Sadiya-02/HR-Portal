@@ -19,6 +19,10 @@ from .forms import TaskAssignForm
 from django.http import HttpResponse
 from .forms import EstimateForm,InvoiceForm
 from .models import Estimate,Invoice
+from django.utils import timezone
+from datetime import date,timedelta,datetime
+from django.utils import timezone
+from django.db.models.functions import TruncMonth
 
 # Create your views here.
 
@@ -480,3 +484,107 @@ def upload_invoice(request):
 def view_all_invoices_admin(request):
     invoices = Invoice.objects.all()
     return render(request, 'adm_all_invoices.html', {'invoices': invoices})
+
+
+def attendance_data(request):
+    # Get the date from request GET parameters or use today's date
+    selected_date = request.GET.get('date')
+    
+    if selected_date:
+        try:
+            selected_date = date.fromisoformat(selected_date)
+        except (ValueError, TypeError):
+            selected_date = timezone.now().date()
+    else:
+        selected_date = timezone.now().date()
+    
+    # Get attendance records for the selected date
+    attendances = Attendance.objects.filter(date=selected_date).select_related('user')
+    
+    context = {
+        'selected_date': selected_date,
+        'attendances': attendances,
+    }
+    
+    return render(request, 'attendence_data.html', context)
+
+
+def attendance_report(request):
+    if not request.user.is_authenticated:
+        # Handle unauthenticated users
+        pass
+    
+    current_user = request.user
+    today = timezone.now().date()
+    selected_month = request.GET.get('month')
+    
+    # Current Week (last 7 days)
+    week_start = today - timedelta(days=7)
+    weekly_attendances = Attendance.objects.filter(
+        user=current_user,
+        date__gte=week_start
+    ).order_by('-date')
+    
+    # Get all  months with attendance data
+    all_available_months = Attendance.objects.filter(
+        user=current_user
+    ).annotate(
+        month=TruncMonth('date')
+    ).values_list('month', flat=True).distinct().order_by('-month')
+    
+    # monthly data if any month selected
+    if selected_month:
+        try:
+            selected_date = datetime.strptime(selected_month, '%Y-%m').date()
+            month_start = selected_date.replace(day=1)
+            month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+            
+            attendances = Attendance.objects.filter(
+                user=current_user,
+                date__gte=month_start,
+                date__lte=month_end
+            ).order_by('-date')
+            
+            monthly_data = [{
+                'month_start': month_start,
+                'month_end': month_end,
+                'attendances': attendances,
+                'month_name': month_start.strftime("%B %Y"),
+                'is_current': (month_start.month == today.month and 
+                              month_start.year == today.year)
+            }]
+        except ValueError:
+            monthly_data = []
+    else:
+        # Get all months data
+        monthly_data = []
+        for month in all_available_months:
+            month_start = month
+            month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+            
+            attendances = Attendance.objects.filter(
+                user=current_user,
+                date__gte=month_start,
+                date__lte=month_end
+            ).order_by('-date')
+            
+            monthly_data.append({
+                'month_start': month_start,
+                'month_end': month_end,
+                'attendances': attendances,
+                'month_name': month_start.strftime("%B %Y"),
+                'is_current': (month_start.month == today.month and 
+                              month_start.year == today.year)
+            })
+    
+    context = {
+        'current_user': current_user,
+        'weekly_attendances': weekly_attendances,
+        'monthly_data': monthly_data,
+        'all_available_months': all_available_months,
+        'selected_month': selected_month,
+        'current_month': today,
+        'week_start': week_start,
+        'today': today,
+    }
+    return render(request, 'report.html', context)

@@ -44,5 +44,7 @@ urlpatterns=[
     path('upload-invoice/', views.upload_invoice, name='upload_invoice'),
     path('all-invoices/', views.view_all_invoices_admin, name='view_all_invoices_admin'),
     path('see-clients/', views.see_clients, name='see_clients'),
+    path('attendance1/', views.attendance_data, name='attendance_data'),
+    path('user/attendance/', views.attendance_report, name='attendance_report'),
 ]
 
