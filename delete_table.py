@@ -8,7 +8,7 @@ from django.db import connection
 def drop_table():
     try:
         with connection.cursor() as cursor:
-            cursor.execute("DROP TABLE client_notification;")
+            cursor.execute("DROP TABLE chat_chatmessage;")
             print("✅ Table 'invoices_invoice' dropped successfully")
     except Exception as e:
         print(f"❌ Error: {e}")

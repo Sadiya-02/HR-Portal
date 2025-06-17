@@ -65,8 +65,8 @@ padding: 20px 15px;
     background-color:#04B173;
 }
 
- #side-menu a {
-            color:#fff;
+#side-menu a {
+            color:#0e0d0d;
            border-bottom: 1px solid #84B899 !important;
            height: 55px;
         }
@@ -127,6 +127,14 @@ margin-right: -24px;
 border-color: #27A6BE;
 }
 /*media queries*/
+.dropdown-menu{
+    background-color: #04B173;
+    color:#04B173 ;
+    position: absolute;
+    left: 100%;            
+    top: -60%;  
+}
+
 
 @media(min-width:768px) 
 {

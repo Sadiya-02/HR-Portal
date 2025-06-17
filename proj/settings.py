@@ -35,12 +35,16 @@ INSTALLED_APPS = [
     'employee',
     'customadmin',
     'client',
+    'chat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'channels',
+    'daphne',
     'django.contrib.staticfiles',
+    
 ]
 
 
@@ -73,6 +77,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'proj.wsgi.application'
+ASGI_APPLICATION = 'proj.asgi.application'
 
 
 # Database
@@ -129,3 +134,9 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
