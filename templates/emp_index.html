@@ -312,10 +312,10 @@
                         <a class="nav-link dropdown-toggle" href="#" id="chatDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-solid fa-comments fa-fw"></i> Chat
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="chatDropdown">
-                            <li><a class="dropdown-item" href="{% url 'chat-with-admin' %}">Chat with Admin</a></li>
-                            <li><a class="dropdown-item" href="{% url 'chat-with-client' %}">Chat with Client</a></li>
-                            <li><a class="dropdown-item" href="{% url 'chat-with-employee' %}">Chat with TeamMates</a></li>
+                        <ul class="dropdown-menu" id="chatDropdown-menu" aria-labelledby="chatDropdown">
+                            <li><a class="dropdown-item" id="chatDropdown-item" href="{% url 'chat-with-admin' %}">Chat with Admin</a></li>
+                            <li><a class="dropdown-item" id="chatDropdown-item" href="{% url 'chat-with-client' %}">Chat with Client</a></li>
+                            <li><a class="dropdown-item" id="chatDropdown-item" href="{% url 'chat-with-employee' %}">Chat with TeamMates</a></li>
                         </ul>
                     </li>
                     <li>

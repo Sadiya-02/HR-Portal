@@ -127,12 +127,16 @@ margin-right: -24px;
 border-color: #27A6BE;
 }
 /*media queries*/
-.dropdown-menu{
+#chatDropdown-menu{
     background-color: #04B173;
     color:#04B173 ;
     position: absolute;
     left: 100%;            
     top: -60%;  
+}
+#chatDropdown-item:hover,#chatDropdown-item:focus{
+    background-color: #eff5f3;
+    color:#04B173 ; 
 }
 
 
