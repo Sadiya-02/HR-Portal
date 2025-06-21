@@ -81,3 +81,13 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.project.name} - {self.assigned_to.username}"
+
+class EmployeeNotification(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_emp_notifications', null=True)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_emp_notifications', null=True)
+    message = models.TextField()
+    is_seen = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} to {self.receiver}: {self.message[:20]}"

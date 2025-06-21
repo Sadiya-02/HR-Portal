@@ -39,3 +39,4 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'check_in', 'check_out')
     list_filter = ('user', 'date')
     search_fields = ('user__username',)
+

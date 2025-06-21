@@ -11,7 +11,7 @@ urlpatterns=[
     path('empprojects/', views.empprojects, name='empprojects'),
     path('upload/<int:project_id>/', views.upload_file, name='upload_file'),
     path('salary.html/',views.salary,name='salary'),
-    path('task.html/',views.task,name='tasks'),
+    # path('task.html/',views.task,name='tasks'),
     path('todo/', views.emp_todo, name='emp_todolist'),
     path('todo/edit/<int:todo_id>/', views.edit_todo, name='edit_todo'),
     path('todo/delete/<int:todo_id>/', views.delete_todo, name='delete_todo'),
@@ -24,5 +24,6 @@ urlpatterns=[
     path('leave-request/', views.leave_request_view, name='leave_request'),
     path('my-leave-request/', views.employee_leave_requests, name='leave_request_success'),
     path('my-tasks/', views.my_tasks, name='my-tasks'),
+    path('notifications/', views.notification_page, name='employee_notifications'),
 
 ]

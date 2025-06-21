@@ -12,4 +12,5 @@ urlpatterns=[
     path('estimates/', views.client_estimates, name='client_estimates'),
     path('estimate/<int:estimate_id>/respond/', views.respond_estimate, name='respond_estimate'),
     path('my-invoices/', views.client_invoices, name='client_invoices'),
+    
 ]

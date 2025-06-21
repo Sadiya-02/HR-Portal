@@ -64,3 +64,5 @@ class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = ['client', 'title', 'file']
+
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notifications</title>
+    <style>
+        body {
+            background-color:whitesmoke;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 30px;
+        }
+        .notification-list {
+            margin-top: 30px;
+            background: #6d4242;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+        }
+        .notification-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-item.unread {
+            font-weight: bold;
+            background-color: #f0f8ff;
+        }
+        .timestamp {
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<!-- <body>
+    <h2>Notifications</h2>
+    <ul>
+        {% for notification in notifications %}
+            <li {% if not notification.is_seen %} style="font-weight:bold;" {% endif %}>
+                {{ notification.message }} - {{ notification.created_at|date:"Y-m-d H:i" }}
+            </li>
+        {% empty %}
+            <li>No notifications yet.</li>
+        {% endfor %}
+    </ul>
+</body> -->
+<body>
+    <div style="
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color:#f0f2f5;
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 1000;
+      ">
+      <a href="javascript:history.back()" style="
+          text-decoration: none;
+          color: black;
+          font-weight: bold;
+          font-size: 16px;
+      ">
+          &larr; Back
+      </a>
+    </div>
+    <div class="container notification-list">
+        <h2 class="mb-4">🔔 Notifications</h2>
+        {% if notifications %}
+            <ul class="list-unstyled">
+                {% for notification in notifications %}
+                    <li class="notification-item {% if not notification.is_seen %}unread{% endif %}">
+                        {{ notification.message }}
+                        <div class="timestamp">{{ notification.created_at|date:"Y-m-d H:i" }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="text-muted">No notifications yet.</div>
+        {% endif %}
+    </div>
+</body>
+</html>
+</html>

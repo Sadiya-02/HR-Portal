@@ -8,7 +8,7 @@ from .models import EmployeeTodo
 from employee.models import Event
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from customadmin.models import Attendance
+from customadmin.models import Attendance, Todo
 from datetime import datetime
 from django.http import HttpResponse
 import pytz
@@ -17,6 +17,8 @@ from customadmin.forms import EmployeeSolutionForm
 from .forms import LeaveRequestForm
 from .models import LeaveRequest
 from client.models import Notification
+from .models import EmployeeNotification
+
 
 # Create your views here.
 def employee_login(request):
@@ -57,6 +59,13 @@ def empprojects(request):
     try:
         employee = Employee.objects.get(user=request.user)
         projects = employee.projects.all()
+        admin_user = User.objects.filter(is_superuser=True).first()
+        if admin_user:
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=admin_user,
+                message=f"{request.user.first_name} viewed their assigned projects."
+            )
         return render(request, 'empproject.html', {'projects': projects})
     except Employee.DoesNotExist:
         return HttpResponse("❌ You are not linked to an employee profile. Please contact the administrator.")
@@ -77,12 +86,6 @@ def salary(request):
 
 def events(request):
     return render(request,'events.html')
-
-
-
-
-def task(request):
-    return render(request,'task.html')
 
 def emp_todo(request):
     if request.method == 'POST':
@@ -106,10 +109,14 @@ def edit_todo(request, todo_id):
 
 
 def delete_todo(request, todo_id):
-    todo = get_object_or_404(EmployeeTodo, id=todo_id, user=request.user)
-    todo.delete()
-    return redirect('emp_todolist')
-
+    if request.user.is_superuser:
+        todo = get_object_or_404(Todo, id=todo_id)
+        todo.delete()
+        return redirect('todo_list')
+    else:
+        todo=get_object_or_404(EmployeeTodo,id=todo_id, user=request.user)
+        todo.delete()
+        return redirect('emp_todolist')
 
 def view_events(request):
     today = timezone.now().date()
@@ -149,22 +156,61 @@ def assigned_tickets(request):
     tickets = Ticket.objects.filter(assigned_employee=request.user, status='Assigned')
     return render(request, 'assigned_ticket.html', {'tickets': tickets})
 
+
 @login_required
 def solve_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, assigned_employee=request.user)
+    
+    # Try to get the existing solution if already present
+    try:
+        existing_solution = EmployeeSolution.objects.get(ticket=ticket)
+    except EmployeeSolution.DoesNotExist:
+        existing_solution = None
+
     if request.method == 'POST':
-        form = EmployeeSolutionForm(request.POST)
+        form = EmployeeSolutionForm(request.POST, instance=existing_solution)
         if form.is_valid():
             solution = form.save(commit=False)
             solution.ticket = ticket
             solution.employee = request.user
             solution.save()
+
             ticket.status = 'Solved'
             ticket.save()
+
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                EmployeeNotification.objects.create(
+                    sender=request.user,
+                    receiver=admin_user,
+                    message=f"Ticket #{ticket.id} has been marked as solved by {request.user.username}."
+                )
             return redirect('assigned_tickets')
     else:
-        form = EmployeeSolutionForm()
+        form = EmployeeSolutionForm(instance=existing_solution)
+
     return render(request, 'solve_ticketemp.html', {'form': form, 'ticket': ticket})
+
+
+# def leave_request_view(request):
+#     if request.method == 'POST':
+#         form = LeaveRequestForm(request.POST)
+#         if form.is_valid():
+#             leave = form.save(commit=False)
+#             leave.employee = request.user
+#             leave.save()
+
+#             admin_user = User.objects.filter(is_superuser=True).first()
+#             if admin_user:
+#                 EmployeeNotification.objects.create(
+#                     sender=request.user,
+#                     receiver=admin_user,
+#                     message=f"{request.user.username} submitted a leave request from {leave.start_date} to {leave.end_date}."
+#                 )
+#             return redirect('leave_request_success')  
+#         else:
+#             form = LeaveRequestForm()
+#         return render(request, 'leave_request_form.html', {'form': form})
 
 def leave_request_view(request):
     if request.method == 'POST':
@@ -173,14 +219,21 @@ def leave_request_view(request):
             leave = form.save(commit=False)
             leave.employee = request.user
             leave.save()
-            Notification.objects.create(
-                user=request.user,
-                message="Your leave request has been submitted."
-            )
-            return redirect('leave_request_success')  
+
+            # Notify admin
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                EmployeeNotification.objects.create(
+                    sender=request.user,
+                    receiver=admin_user,
+                    message=f"{request.user.username} submitted a leave request from {leave.start_date} to {leave.end_date}."
+                )
+
+            return redirect('leave_request_success')  # ✅ redirect after successful post
     else:
-        form = LeaveRequestForm()
-    return render(request, 'leave_request_form.html', {'form': form})
+        form = LeaveRequestForm()  # ✅ form for GET request
+
+    return render(request, 'leave_request_form.html', {'form': form})  # ✅ must return in all cases
 
 def employee_leave_requests(request):
     requests = LeaveRequest.objects.filter(employee=request.user)
@@ -191,5 +244,18 @@ def my_tasks(request):
         tasks = Task.objects.all()
     else:
         tasks = Task.objects.filter(assigned_to=request.user)
+
+        admin_user = User.objects.filter(is_superuser=True).first()
+        if admin_user:
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=admin_user,
+                message=f"{request.user.username} viewed their assigned tasks."
+            )
+
     return render(request, 'my_tasks.html', {'tasks': tasks})
 
+@login_required
+def notification_page(request):
+    notifications = EmployeeNotification.objects.filter(receiver=request.user).order_by('-created_at')
+    return render(request, 'emp_notifications.html', {'notifications': notifications})

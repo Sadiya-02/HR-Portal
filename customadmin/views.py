@@ -14,7 +14,7 @@ from .forms import AddClientForm
 from customadmin.models import Ticket, EmployeeSolution
 from customadmin.forms import AssignTicketForm
 from django.contrib.auth.decorators import login_required
-from client.models import ClientProject, Notification
+from client.models import ClientProject
 from .forms import TaskAssignForm
 from django.http import HttpResponse
 from .forms import EstimateForm,InvoiceForm
@@ -23,7 +23,11 @@ from django.utils import timezone
 from datetime import date,timedelta,datetime
 from django.utils import timezone
 from django.db.models.functions import TruncMonth
-
+from client.models import Notification as ClientNotification
+from employee.models import EmployeeNotification
+from django.utils import timezone
+from itertools import chain
+from operator import attrgetter
 # Create your views here.
 
 def dashboard(request):
@@ -163,10 +167,14 @@ def toggle_task(request, task_id):
     todo.save()
     return redirect('todo_list')
 
-def delete_task(request, task_id):
-    Todo.objects.get(id=task_id).delete()
-    return redirect('todo_list')
+# def delete_task(request, task_id):
+#     Todo.objects.get(id=task_id).delete()
+#     return redirect('todo_list')
 
+def delete_task(request, task_id):
+    task = get_object_or_404(Todo, id=task_id)
+    task.delete()
+    return redirect('todo_list')
 
 # def add_project(request):
 #     if request.method == 'POST':
@@ -200,7 +208,7 @@ def add_project(request):
         try:
             assigned_to = Employee.objects.get(id=employee_id)
 
-            Project.objects.create(
+            project=Project.objects.create(
                 name=name,
                 description=description,
                 assigned_to=assigned_to,
@@ -208,6 +216,13 @@ def add_project(request):
                 end_date=end_date,
                 uploaded_file=uploaded_file  # 👈 saving the file (or None if not provided)
             )
+
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=assigned_to.user,  # assuming Employee has a OneToOne to User
+                message=f"You have been assigned a new project: '{project.name}'."
+            )
+
             return redirect('add_project')  # redirect after successful submission
 
         except Employee.DoesNotExist:
@@ -323,6 +338,14 @@ def assign_ticket(request, ticket_id):
         if form.is_valid():
             ticket.status = 'Assigned'
             form.save()
+            
+            assigned_employee = ticket.assigned_employee  # assuming this is a User
+            if assigned_employee:
+                EmployeeNotification.objects.create(
+                    sender=request.user,
+                    receiver=assigned_employee,
+                    message=f"You have been assigned ticket #{ticket.id}: {ticket.subject}"
+                )
             return redirect('view_tickets')
     else:
         form = AssignTicketForm(instance=ticket)
@@ -345,10 +368,30 @@ def admin_project_list(request):
     projects = ClientProject.objects.all().order_by('-created_at')
     return render(request, 'client_project_list.html', {'projects': projects})
 
-def notifications_view(request):
-    notifications = Notification.objects.filter(is_seen=False).order_by('-created_at')
-    return render(request, 'notifications.html', {'notifications': notifications})
+# def notifications_view(request):
+#     notifications = Notification.objects.filter(is_seen=False).order_by('-created_at')
+#     return render(request, 'notifications.html', {'notifications': notifications})
 
+@login_required
+def notifications_view(request):
+    # Only show to admin
+    if not request.user.is_staff:
+        return redirect('home')  # or raise PermissionDenied
+
+    # Fetch client and employee notifications
+    client_notifications = ClientNotification.objects.all()
+    employee_notifications = EmployeeNotification.objects.filter(receiver=request.user)
+
+    # Merge and sort both notification types
+    combined_notifications = sorted(
+        chain(client_notifications, employee_notifications),
+        key=attrgetter('created_at'),
+        reverse=True
+    )
+
+    return render(request, 'notifications.html', {
+        'notifications': combined_notifications
+    })
 
 def edit_client_project(request, project_id):
     # Get the project or return 404 if not found
@@ -359,7 +402,7 @@ def edit_client_project(request, project_id):
             print(form.data)
             updated_project = form.save()
             print(updated_project.status)
-            Notification.objects.create(
+            ClientNotification.objects.create(
                 message=f"Project updated: {updated_project.title}",
                 project=updated_project
             )
@@ -382,26 +425,32 @@ def handle_leave_request(request, leave_id):
             leave.status = 'Approved'
             leave.rejection_reason = ''
             leave.save()
-            Notification.objects.create(
-                user=leave.employee,
-                message="Your leave request has been approved.",
-                project=None
+
+             # ✅ Notify employee
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=leave.employee,  # directly use it
+                message="Your leave request has been approved."
             )
+
+
         elif action == 'reject':
             leave.status = 'Rejected'
             leave.rejection_reason = request.POST.get('rejection_reason', '')
             leave.save()
-            Notification.objects.create(
-                user=leave.employee,
-                message=f"Your leave request has been rejected. Reason: {leave.rejection_reason}",
-                project=None
+
+            # ✅ Notify employee
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=leave.employee,
+                message=f"Your leave request has been rejected. Reason: {leave.rejection_reason}"
             )
-        # Notification to admin
-        Notification.objects.create(
-            user=request.user,
-            message=f"You {'approved' if action == 'approve' else 'rejected'} a leave request.",
-            project=None
-        )
+        # # Notification to admin
+        # EmployeeNotification.objects.create(
+        #     user=request.user,
+        #     message=f"You {'approved' if action == 'approve' else 'rejected'} a leave request.",
+        #     project=None
+        # )
         return redirect('manage_leave_requests')
     return render(request, 'handle_leave_request.html', {'leave': leave})
 
@@ -411,13 +460,10 @@ def assign_task(request):
         form = TaskAssignForm(request.POST)
         if form.is_valid():
             task = form.save()
-            Notification.objects.create(
-                user=task.assigned_to,
-                message=f"You have been assigned a new task for project: {task.project.name}"
-            )
-            Notification.objects.create(
-                user=request.user,
-                message=f"Task assigned to {task.assigned_to.username} successfully."
+            EmployeeNotification.objects.create(
+                sender=request.user,
+                receiver=task.assigned_to,  # must be a User
+                message=f"You have been assigned a new task for project: {task.project.name}."
             )
             return redirect('assign-task')
     else:
