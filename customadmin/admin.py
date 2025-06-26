@@ -1,17 +1,17 @@
-# customadmin/admin.py
+
 
 from django.contrib import admin
 from django.urls import path
 from django.shortcuts import render, redirect
 from employee.forms import EmployeeForm
 from employee.models import Employee
-from .models import Todo
+from .models import Todo,ContactMessage
 from .models import Attendance
 
-# Custom admin view for adding employee
+
 def add_employee_view(request):
     if request.method == "POST":
-        form = EmployeeForm(request.POST, request.FILES)  # 👈 handle uploaded file
+        form = EmployeeForm(request.POST, request.FILES)  
         if form.is_valid():
             form.save()
             return redirect('/admin/dashboard/add_employee/')
@@ -31,7 +31,7 @@ class CustomAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-# Register the model and admin class
+
 admin.site.register(Employee, CustomAdmin)
 admin.site.register(Todo)
 @admin.register(Attendance)
@@ -40,3 +40,7 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_filter = ('user', 'date')
     search_fields = ('user__username',)
 
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'phone', 'message', 'submitted_at')
+    ordering = ['-submitted_at']

@@ -7,7 +7,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import EmployeeTodo,Task
 from django.utils.html import format_html
 
-# Inline Employee in User admin
+
 class EmployeeInline(admin.StackedInline):
     model = Employee
     can_delete = False
@@ -21,7 +21,7 @@ class EmployeeInline(admin.StackedInline):
         return "No file uploaded"
     uploaded_file_preview.short_description = "Uploaded File"
 
-# Custom User admin to show Employee info
+
 class CustomUserAdmin(UserAdmin):
     inlines = (EmployeeInline,)
 
@@ -41,20 +41,16 @@ class CustomUserAdmin(UserAdmin):
             instance.save()
         formset.save_m2m()
 
-# Unregister and re-register the custom User admin
+
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 
-# ✅ Also register Employee separately
-# @admin.register(Employee)
-# class EmployeeAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'designation', 'date_of_joining')
 
 admin.site.register(EmployeeTodo)
 admin.site.register(Task)
-#admin.site.register(EmployeeTodo)
+
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'assigned_to', 'uploaded_file')
-    fields = ('name', 'description', 'assigned_to', 'start_date', 'end_date', 'uploaded_file')
+    list_display = ('name', 'client','assigned_to', 'uploaded_file')
+    fields = ('name','client','description', 'assigned_to', 'start_date', 'end_date', 'uploaded_file')

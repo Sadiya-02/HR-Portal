@@ -106,8 +106,6 @@
     </div>
     <div class="container">
         <h1>Attendance History for {{ current_user.username }}</h1>
-        
-        <!-- Month Selector -->
         <div class="month-selector">
             <form method="get" action="">
                 <label for="selected_month">Select Month:</label>
@@ -124,7 +122,6 @@
             </form>
         </div>
         
-        <!-- Weekly Report (only shown when viewing current month or all months) -->
         {% if not selected_month or selected_month == current_month|date:'Y-m' %}
         <div class="report-section">
             <h2 class="section-title">
@@ -156,8 +153,7 @@
             </table>
         </div>
         {% endif %}
-        
-        <!-- Monthly Reports -->
+
         {% for month in monthly_data %}
             {% if not selected_month or selected_month == month.month_start|date:'Y-m' %}
             <div class="report-section">
@@ -206,7 +202,7 @@
             }
         }
         
-        // Only collapse months if we're viewing all months
+
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const selectedMonth = urlParams.get('month');

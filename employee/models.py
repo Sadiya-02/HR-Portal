@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 import datetime
 import os
+from client.models import Client
 
-# Extend the default User model with a profile-like Employee model
 
 def get_file_path (request,filename):
     original_filename = filename
@@ -25,6 +25,7 @@ class Employee(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='projects')
     description = models.TextField()
     assigned_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='projects')  # Added related_name
     start_date = models.DateField()

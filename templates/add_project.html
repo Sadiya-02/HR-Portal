@@ -213,6 +213,16 @@
                 <label for="name">Project Name</label>
                 <input type="text" id="name" name="name" class="form-control" placeholder="Enter project name" required>
             </div>
+
+            <div class="form-group">
+                <label for="client">Client</label>
+                <select id="client" name="client" class="form-control" required>
+                    <option value="" disabled selected>Select Client</option>
+                    {% for client in clients %}
+                        <option value="{{ client.id }}">{{ client.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             
             <div class="form-group">
                 <label for="description">Project Description</label>

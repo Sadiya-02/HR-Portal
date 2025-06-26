@@ -3,11 +3,11 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout 
 from django.contrib import messages
-from employee.forms import EmployeeForm  # Adjust the import path if needed
+from employee.forms import EmployeeForm  
 from employee.models import Employee,Event,Project,LeaveRequest,Task 
 from client.forms import ProjectForm
 from django.contrib.admin.views.decorators import staff_member_required
-from .models import Todo
+from .models import Todo,ContactMessage
 from .models import Attendance
 from client.models import Client
 from .forms import AddClientForm
@@ -28,7 +28,8 @@ from employee.models import EmployeeNotification
 from django.utils import timezone
 from itertools import chain
 from operator import attrgetter
-# Create your views here.
+from .forms import SalarySlipForm
+from .models import SalarySlip
 
 def dashboard(request):
     return render(request,'dashboard.html')
@@ -73,19 +74,17 @@ def register(request):
             messages.error(request, 'Username already taken.')
         else:
             user = User.objects.create_user(username=username, password=password)
-            user.is_staff = False  # Prevent access to Django admin
+            user.is_staff = False  
             user.save()
             messages.success(request, 'Registration successful. You can now log in.')
-            return redirect('employee_login')  # Make sure this matches your URL name
+            return redirect('employee_login')  
 
     return render(request, 'add_employee.html')
 
-# def password_reset(request):
-#     return render('login.html')
 
 def add_employee(request):
     if request.method == 'POST':
-        # Extract form data
+     
         username = request.POST.get('username')
         password = request.POST.get('password')
         first_name = request.POST.get('firstname')
@@ -94,15 +93,15 @@ def add_employee(request):
         phone = request.POST.get('phone')
         designation = request.POST.get('designation')
         date_of_joining = request.POST.get('date_of_joining')
-        image = request.FILES.get('image')  # ✅ This line is important
+        image = request.FILES.get('image')  
 
         try:
-            # Check if username already exists
+            
             if User.objects.filter(username=username).exists():
                 messages.error(request, "Username already taken. Please choose another.")
                 return redirect('add_employee')
 
-            # Create User
+            
             user = User.objects.create_user(
                 username=username,
                 password=password,
@@ -111,14 +110,14 @@ def add_employee(request):
                 email=email
             )
 
-            # Create Employee record
+            
             employee = Employee.objects.create(
                 user=user,
                 phone=phone,
                 designation=designation,
                 date_of_joining=date_of_joining)
             if image:
-                employee.image=image  # ✅ Assign image here
+                employee.image=image 
                 employee.save()
             else:
                 messages.error("couldn't Upload profile pic of employee")
@@ -126,34 +125,14 @@ def add_employee(request):
         except Exception as e:
             messages.error(request, f"Something went wrong: {str(e)}")
 
-        return redirect('add_employee')  # Redirect to clear POST data and show message
+        return redirect('add_employee') 
 
     return render(request, 'add_employee.html')
 
 
-# def admin_add_task(request):
-#     if request.method == 'POST':
-#         form = TaskForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('add_task')  # or your dashboard
-#     else:
-#         form = TaskForm()
-#     return render(request, 'add_task.html', {'form': form})
-
-# def assign_project(request):
-#     if request.method == 'POST':
-#         form = ProjectAssignForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('assign-project')  # or redirect to a success page
-#     else:
-#         form = ProjectAssignForm()
-#     return render(request, 'customadmin/assign_project.html', {'form': form})
-
 
 def todo_list(request):
-    todos = Todo.objects.all()  # Use "todos" to match context in template
+    todos = Todo.objects.all()  
     if request.method == 'POST':
         title = request.POST.get('title')
         if title:
@@ -167,46 +146,26 @@ def toggle_task(request, task_id):
     todo.save()
     return redirect('todo_list')
 
-# def delete_task(request, task_id):
-#     Todo.objects.get(id=task_id).delete()
-#     return redirect('todo_list')
 
 def delete_task(request, task_id):
     task = get_object_or_404(Todo, id=task_id)
     task.delete()
     return redirect('todo_list')
 
-# def add_project(request):
-#     if request.method == 'POST':
-#         name = request.POST.get('name')
-#         description = request.POST.get('description')
-#         employee_id = request.POST.get('employee')  # employee id from form
-#         start_date = request.POST.get('start_date')
-#         end_date = request.POST.get('end_date')
-#         uploaded_file = request.FILES.get('project_file')
-#         assigned_to = Employee.objects.get(id=assigned_to_id)
-
-#         try:
-#             employee = User.objects.get(id=employee_id)
-#             Project.objects.create(name=name, description=description, assigned_to=employee,end_date=end_date,start_date=start_date)
-#             return redirect('add_project')  # Redirect to the same page or a success page
-#         except User.DoesNotExist:
-#             # Handle the case where the employee does not exist
-#             return render(request, 'add_project.html', {'employees': User.objects.all(), 'error': 'Employee not found.'})
-#     employees = Employee.objects.all()
-#     return render(request, 'add_project.html', {'employees': employees})
 
 def add_project(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
-        employee_id = request.POST.get('employee')  # ID from the form
+        employee_id = request.POST.get('employee')  
+        client_id = request.POST.get('client')  
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
-        uploaded_file = request.FILES.get('project_file')  # 👈 file handling
+        uploaded_file = request.FILES.get('project_file')  
 
         try:
             assigned_to = Employee.objects.get(id=employee_id)
+            client = Client.objects.get(id=client_id)
 
             project=Project.objects.create(
                 name=name,
@@ -214,16 +173,20 @@ def add_project(request):
                 assigned_to=assigned_to,
                 start_date=start_date,
                 end_date=end_date,
-                uploaded_file=uploaded_file  # 👈 saving the file (or None if not provided)
+                client =client,
+                
             )
-
+            if uploaded_file:
+                project.uploaded_file=uploaded_file
+                project.save()
+                
             EmployeeNotification.objects.create(
                 sender=request.user,
-                receiver=assigned_to.user,  # assuming Employee has a OneToOne to User
+                receiver=assigned_to.user, 
                 message=f"You have been assigned a new project: '{project.name}'."
             )
 
-            return redirect('add_project')  # redirect after successful submission
+            return redirect('projectList')  
 
         except Employee.DoesNotExist:
             return render(request, 'add_project.html', {
@@ -232,7 +195,7 @@ def add_project(request):
             })
 
     employees = Employee.objects.all()
-    return render(request, 'add_project.html', {'employees': employees})
+    return render(request, 'add_project.html', {'employees': employees,'clients': Client.objects.all(),})
 
 def add_event(request):
     if request.method == "POST":
@@ -244,7 +207,7 @@ def add_event(request):
         messages.success(request, "Event added successfully.")
         return redirect("add_event")
 
-    events = Event.objects.all().order_by('-created_at')  # Admin also sees all events
+    events = Event.objects.all().order_by('-created_at')  
     return render(request, "add_event.html", {"events": events})
 
 def edit_event(request, event_id):
@@ -312,7 +275,7 @@ def add_client(request):
             messages.success(request, "Client added successfully.")
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
-            return redirect('add_client')
+            return redirect('see_client')
 
         return redirect('add_client')
 
@@ -339,7 +302,7 @@ def assign_ticket(request, ticket_id):
             ticket.status = 'Assigned'
             form.save()
             
-            assigned_employee = ticket.assigned_employee  # assuming this is a User
+            assigned_employee = ticket.assigned_employee  
             if assigned_employee:
                 EmployeeNotification.objects.create(
                     sender=request.user,
@@ -368,21 +331,15 @@ def admin_project_list(request):
     projects = ClientProject.objects.all().order_by('-created_at')
     return render(request, 'client_project_list.html', {'projects': projects})
 
-# def notifications_view(request):
-#     notifications = Notification.objects.filter(is_seen=False).order_by('-created_at')
-#     return render(request, 'notifications.html', {'notifications': notifications})
 
 @login_required
 def notifications_view(request):
-    # Only show to admin
+    
     if not request.user.is_staff:
-        return redirect('home')  # or raise PermissionDenied
-
-    # Fetch client and employee notifications
+        return redirect('home')  
     client_notifications = ClientNotification.objects.all()
     employee_notifications = EmployeeNotification.objects.filter(receiver=request.user)
 
-    # Merge and sort both notification types
     combined_notifications = sorted(
         chain(client_notifications, employee_notifications),
         key=attrgetter('created_at'),
@@ -394,10 +351,9 @@ def notifications_view(request):
     })
 
 def edit_client_project(request, project_id):
-    # Get the project or return 404 if not found
     project = get_object_or_404(ClientProject, id=project_id)
     if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES, instance=project) # pre-populate proj info
+        form = ProjectForm(request.POST, request.FILES, instance=project) 
         if form.is_valid():
             print(form.data)
             updated_project = form.save()
@@ -408,7 +364,7 @@ def edit_client_project(request, project_id):
             )
             return redirect('admin_project_list')  
     else:
-        form = ProjectForm(instance=project)  # pre-populate proj info
+        form = ProjectForm(instance=project)  
         return render(request, 'client_add_project.html', {'form': form})
     
     return redirect('admin_project_list')
@@ -426,10 +382,10 @@ def handle_leave_request(request, leave_id):
             leave.rejection_reason = ''
             leave.save()
 
-             # ✅ Notify employee
+  
             EmployeeNotification.objects.create(
                 sender=request.user,
-                receiver=leave.employee,  # directly use it
+                receiver=leave.employee,  
                 message="Your leave request has been approved."
             )
 
@@ -439,18 +395,13 @@ def handle_leave_request(request, leave_id):
             leave.rejection_reason = request.POST.get('rejection_reason', '')
             leave.save()
 
-            # ✅ Notify employee
+          
             EmployeeNotification.objects.create(
                 sender=request.user,
                 receiver=leave.employee,
                 message=f"Your leave request has been rejected. Reason: {leave.rejection_reason}"
             )
-        # # Notification to admin
-        # EmployeeNotification.objects.create(
-        #     user=request.user,
-        #     message=f"You {'approved' if action == 'approve' else 'rejected'} a leave request.",
-        #     project=None
-        # )
+       
         return redirect('manage_leave_requests')
     return render(request, 'handle_leave_request.html', {'leave': leave})
 
@@ -462,7 +413,7 @@ def assign_task(request):
             task = form.save()
             EmployeeNotification.objects.create(
                 sender=request.user,
-                receiver=task.assigned_to,  # must be a User
+                receiver=task.assigned_to, 
                 message=f"You have been assigned a new task for project: {task.project.name}."
             )
             return redirect('assign-task')
@@ -475,8 +426,7 @@ def update_task_status(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
         task = get_object_or_404(Task, id=task_id)
-        
-        # Check if the checkbox was checked or unchecked
+    
         if 'task_check' in request.POST:
             task.completed = True
             messages.success(request, 'Task marked as completed!')
@@ -533,7 +483,7 @@ def view_all_invoices_admin(request):
 
 
 def attendance_data(request):
-    # Get the date from request GET parameters or use today's date
+
     selected_date = request.GET.get('date')
     
     if selected_date:
@@ -544,7 +494,7 @@ def attendance_data(request):
     else:
         selected_date = timezone.now().date()
     
-    # Get attendance records for the selected date
+
     attendances = Attendance.objects.filter(date=selected_date).select_related('user')
     
     context = {
@@ -557,28 +507,28 @@ def attendance_data(request):
 
 def attendance_report(request):
     if not request.user.is_authenticated:
-        # Handle unauthenticated users
+        
         pass
     
     current_user = request.user
     today = timezone.now().date()
     selected_month = request.GET.get('month')
     
-    # Current Week (last 7 days)
+
     week_start = today - timedelta(days=7)
     weekly_attendances = Attendance.objects.filter(
         user=current_user,
         date__gte=week_start
     ).order_by('-date')
     
-    # Get all  months with attendance data
+
     all_available_months = Attendance.objects.filter(
         user=current_user
     ).annotate(
         month=TruncMonth('date')
     ).values_list('month', flat=True).distinct().order_by('-month')
     
-    # monthly data if any month selected
+
     if selected_month:
         try:
             selected_date = datetime.strptime(selected_month, '%Y-%m').date()
@@ -602,7 +552,7 @@ def attendance_report(request):
         except ValueError:
             monthly_data = []
     else:
-        # Get all months data
+        
         monthly_data = []
         for month in all_available_months:
             month_start = month
@@ -634,3 +584,44 @@ def attendance_report(request):
         'today': today,
     }
     return render(request, 'report.html', context)
+
+def contact_submit(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        message = request.POST.get('message')
+
+        if name and email and phone and message:
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                phone=phone,
+                message=message
+            )
+            messages.success(request, "Your message has been sent.")
+        else:
+            messages.error(request, "All fields are required.")
+
+    return redirect('home')  
+
+@staff_member_required
+def contact_messages_view(request):
+    messages = ContactMessage.objects.order_by('-submitted_at')
+    return render(request, 'admin_view_messages.html', {'messages': messages})
+
+@login_required
+def upload_salary_slip(request):
+    if request.method == 'POST':
+        form = SalarySlipForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('salary_slip_list_admin')  
+    else:
+        form = SalarySlipForm()
+    return render(request, 'upload_salary_slip.html', {'form': form})
+
+@login_required
+def salary_slip_list_admin(request):
+    slips = SalarySlip.objects.all().order_by('-uploaded_at')
+    return render(request, 'salary_slip_list_admin.html', {'slips': slips})

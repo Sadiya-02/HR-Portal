@@ -102,7 +102,7 @@
         border-radius: 15px;
         background-color:rgba(8, 8, 8, 0.66);
     }
-    /* Chat log container */
+
     #chat-log {
         display: flex;
         flex-direction: column;
@@ -115,61 +115,58 @@
         background-color:rgba(8, 8, 8, 0.66);
     }
 
-    /* Message container */
+
     .message {
         display: flex;
-        max-width: 30%; /* Ensure messages don't exceed 70% of the container width */
-        min-width: 10%; /* Ensure messages don't exceed 70% of the container width */
+        max-width: 30%; 
+        min-width: 10%; 
         padding: 10px;
         border-radius: 10px;
     }
 
-    /* Current user's messages (right side) */
+    
     .message-right {
         align-self: flex-end;
         background-color:rgb(10, 209, 73);
         color: white;
     }
 
-    /* Other users' messages (left side) */
     .message-left {
         align-self: flex-start;
         background-color:#007bff;
         color: white;
     }
 
-    /* Message content */
     .message-content {
-        position: relative; /* Required for absolute positioning of the timestamp */
-        word-wrap: break-word; /* Break long words */
-        overflow-wrap: break-word; /* Break long words */
-        max-width: 100%; /* Prevent overflow */
-        padding-bottom: 20px; /* Add space for the timestamp */
+        position: relative; 
+        word-wrap: break-word; 
+        overflow-wrap: break-word; 
+        max-width: 100%; 
+        padding-bottom: 20px; 
     }
 
-    /* Timestamp styling */
     .timestamp {
-        position: absolute; /* Position the timestamp absolutely */
+        position: absolute; 
         align-self: flex-end;
-        bottom: 5px; /* Adjust as needed */
-        font-size: 0.75rem; /* Small font size */
-        color:rgb(0, 3, 6); /* Subtle color */
-        border-radius: 5px; /* Rounded corners */
+        bottom: 5px; 
+        font-size: 0.75rem; 
+        color:rgb(0, 3, 6); 
+        border-radius: 5px; 
     }
 
-    /* Timestamp alignment for current user's messages (right side) */
+    
     .message-right .timestamp {
-        right: 5px; /* Align to the right */
+        right: 5px; 
         bottom: 0px;
     }
 
-    /* Timestamp alignment for other user's messages (left side) */
+
     .message-left .timestamp {
-        right: 5px; /* Align to the left */
+        right: 5px; 
         bottom: 0px;
     }
 
-    {% comment %} /* Input and button container */
+    {% comment %} 
     #chat-message-input {
         width: calc(100% - 100px);
         padding: 10px;

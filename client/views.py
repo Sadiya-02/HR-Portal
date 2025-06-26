@@ -10,7 +10,7 @@ from .models import ClientProject, Notification
 from customadmin.models import Estimate,Invoice
 from django.utils import timezone
 
-# Create your views here.
+
 def client_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -94,7 +94,7 @@ def respond_estimate(request, estimate_id):
             Notification.objects.create(
                 client=request.user,
                 message=f"You approved estimate ID {estimate.id}",
-                project=None  # or pass a related project if applicable
+                project=None  
             )
 
             return redirect('client_estimates')
@@ -126,3 +126,5 @@ def respond_estimate(request, estimate_id):
 def client_invoices(request):
     invoices = Invoice.objects.filter(client=request.user)
     return render(request, 'client_view_invoices.html', {'invoices': invoices})
+
+

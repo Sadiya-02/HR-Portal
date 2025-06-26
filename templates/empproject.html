@@ -28,16 +28,14 @@
           color: #ffffff;
           font-weight: bold;
           font-size: 16px;
-      ">
+        ">
           &larr; Back
       </a>
     </div>
     <div class="row">
-                 <!--page header-->
         <div class="col-lg-12">
             <h1 class="page-header" style="text-align: center;">Project Details</h1>
         </div>
-                 <!--end page header-->
     </div>
     <div class="container">
         <div class="row">
@@ -47,6 +45,8 @@
                         <img class="poster" src="{% static 'assets/img/proj1.jpg' %}" />
                         <span class="hot-news">Assigned</span>
                         <h3 class="news-log">{{ project.name }}</h3>
+                        <p><strong>Client:</strong> {{ project.client.company_name }}</p> 
+                        {# Change to .name or .email if needed #}
                         <p class="description">
                             {{ project.description }}
                         </p>
@@ -70,9 +70,6 @@
                       </div>
                       {% endfor %}
                       
-
-    <!-- end wrapper -->
-
     <!-- Core Scripts - Include with every page -->
     <script src="{% static 'assets/plugins/jquery-1.10.2.js' %}"></script>
     <script src="{% static 'assets/plugins/bootstrap/bootstrap.min.js' %}"></script>
@@ -124,7 +121,6 @@ a.btn-login:hover {
     transform: scale(1.05);
 }
 .riglt-floats-xs {
-    /* display: -webkit-inline-box; */
     float: right;
 }
 a.btn-startgames:hover {
@@ -143,8 +139,6 @@ a.btn-startgames:hover {
     cursor: pointer;
 }
 .dropdown {
-    /* position: absolute; */
-    /* display: inline-block; */
     padding-right: 30px;
     margin-right: 0px;
     margin-top: 6px;
@@ -191,9 +185,6 @@ a.btn-startgames:hover {
     .swiper-slide {
       text-align: center;
       font-size: 18px;
-      /* background: #fff; */
-
-      /* Center slide text vertically */
       display: -webkit-box;
       display: -ms-flexbox;
       display: -webkit-flex;
@@ -287,7 +278,6 @@ p.desctops {
 }
 
 a.block-s1:hover {
-    /* opacity: .8; */
     -moz-transform: scale(1.05);
     -ms-transform: scale(1.05);
     -webkit-transform: scale(1.05);
@@ -432,7 +422,6 @@ span.new-news {
 }
 
 .circle {
-  /* margin: 6px 6px 20px; */
   display: -webkit-inline-box;
   line-height: 1.2;
 }
@@ -465,7 +454,6 @@ span.new-news {
 }
 
 p {
-  /* margin: 40px 0; */
   color: #6c7d8e !important;
 }
 
@@ -476,7 +464,6 @@ p {
 .install a {
   display: block;
   width: auto;
-  /* vertical-align: middle; */
   padding: 6px 12px;
   line-height: 20px;
   background-color: #111;
@@ -622,7 +609,6 @@ ul.drop-vape {
     padding: 0;
 }
 
-/* li {} */
 
 ul.drop-vape li a:hover {text-decoration: none;color: #2e3338;border-bottom: 3px solid #4a82e4;}
 a.btn-drop:hover {
@@ -820,7 +806,6 @@ span.num-4:after {
 }
 span.num-video {
     background: linear-gradient( 45deg, #fe5a73, #fda756 );
-    /* padding: 15px 18px; */
     color: #fff;
     font-size: 22px;
     font-weight: 700;
@@ -1048,16 +1033,16 @@ span.name-form:after {
     margin-left: 200px;
     margin-top: -35px;
 }
-::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+::-webkit-input-placeholder { 
   color: #b7bcc2;
 }
-::-moz-placeholder { /* Firefox 19+ */
+::-moz-placeholder { 
   color: #b7bcc2;
 }
-:-ms-input-placeholder { /* IE 10+ */
+:-ms-input-placeholder { 
   color: #b7bcc2;
 }
-:-moz-placeholder { /* Firefox 18- */
+:-moz-placeholder { 
   color: #b7bcc2;
 }
 

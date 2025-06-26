@@ -75,45 +75,45 @@
 </head>
 <body>
     <div style="
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
-    padding: 10px 16px;
-    border-radius: 8px;
-    z-index: 1000;
-    ">
-    <a href="javascript:history.back()" style="
-        text-decoration: none;
-        color: #ffffff;
-        font-weight: bold;
-        font-size: 16px;
-    ">
-        &larr; Back
-    </a>
-  </div>
-  <div style="height: 60px;"></div>
-    <div class="header">
-        <h1>Projects List</h1>
-        <a href="{% url 'add_project' %}"><button class="add-project-btn">+ New Project</button></a>
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 10px 16px;
+        border-radius: 8px;
+        z-index: 1000;
+        ">
+        <a href="javascript:history.back()" style="
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+            ">
+            &larr; Back
+        </a>
     </div>
-    
-    <div class="projects-container">
-        <!-- Project Card 1 -->
-         {% for project in projects %}
-        <div class="project-card">
-            <h2 class="project-title">{{ project.name}}</h2>
-            <p class="project-description">
-                {{ project.description}}
-            </p>
-            {% if project.uploaded_file %}
-                <a href="{{ project.uploaded_file.url }}" target="_blank"><button>view File</button></a>
-            {% endif %}
-            {% comment %} <button>view File</button> {% endcomment %}
+    <div style="height: 60px;"></div>
+        <div class="header">
+            <h1>Projects List</h1>
+            <a href="{% url 'add_project' %}"><button class="add-project-btn">+ New Project</button></a>
         </div>
-        {% empty %}
-            <h4>No projects added yet.</h4>
-        {% endfor %}
-    </div>
-</body>
+    
+        <div class="projects-container">
+
+            {% for project in projects %}
+            <div class="project-card">
+                <h2 class="project-title">{{ project.name}}</h2>
+                <p class="project-description">
+                    {{ project.description}}
+                </p>
+                {% if project.uploaded_file %}
+                    <a href="{{ project.uploaded_file.url }}" target="_blank"><button>view File</button></a>
+                {% endif %}
+                {% comment %} <button>view File</button> {% endcomment %}
+            </div>
+            {% empty %}
+                <h4>No projects added yet.</h4>
+            {% endfor %}
+        </div>
+    </body>
 </html>

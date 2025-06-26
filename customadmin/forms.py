@@ -2,7 +2,7 @@ from django import forms
 from client.models import Client
 from .models import Ticket, EmployeeSolution
 from django.contrib.auth.models import User
-from .models import Ticket
+from .models import Ticket,SalarySlip
 from employee.models import Task, Project
 from .models import Estimate,Invoice
 
@@ -66,3 +66,7 @@ class InvoiceForm(forms.ModelForm):
         fields = ['client', 'title', 'file']
 
 
+class SalarySlipForm(forms.ModelForm):
+    class Meta:
+        model = SalarySlip
+        fields = ['employee', 'month', 'slip_file']

@@ -8,13 +8,11 @@ urlpatterns=[
     path('logout/',logoutPage,name='logoutpage'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('register/', views.register, name='register'),
-    # path('password_reset/', views.password_reset, name='password_reset'),
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('add_employee/', views.add_employee, name='add_employee'),
-    # path('assign-project/', views.assign_project, name='assign-project'),
     path('admin/todo/', views.todo_list, name='todo_list'),
     path('admin/toggle/<int:task_id>/', views.toggle_task, name='toggle_todo'),
     path('admin/delete/<int:task_id>/', views.delete_task, name='delete_task'),
@@ -46,5 +44,9 @@ urlpatterns=[
     path('see-clients/', views.see_clients, name='see_clients'),
     path('attendance1/', views.attendance_data, name='attendance_data'),
     path('user/attendance/', views.attendance_report, name='attendance_report'),
+    path('contact/submit/', views.contact_submit, name='contact-message'),
+    path('admin/messages/', views.contact_messages_view, name='admin-messages'),
+    path('upload-salary-slip/', views.upload_salary_slip, name='upload_salary_slip'),
+    path('all-salary-slips/', views.salary_slip_list_admin, name='salary_slip_list_admin'),
 ]
 

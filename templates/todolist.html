@@ -137,7 +137,7 @@
         {% for todo in todos %}
         <li>
             {% if edit_id|default:'' == todo.id|stringformat:"s" %}
-                <!-- Edit Mode -->
+               
                 <form method="post" action="{% url 'edit_todo' todo.id %}" class="inline">
                  {% csrf_token %}
                  <input type="text" name="task" value="{{ todo.task }}" required>
@@ -145,7 +145,7 @@
                     <a href="{% url 'emp_todolist' %}" class="edit-cancel">❌ Cancel</a>
                 </form>
             {% else %}
-                <!-- View Mode -->
+               
                 {{ todo.task }}
 
                 <span class="action-buttons">

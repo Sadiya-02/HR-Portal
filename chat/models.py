@@ -1,11 +1,11 @@
-# chat/models.py
+
 from django.db import models
 from django.contrib.auth.models import User
 
 class ChatRoom(models.Model):
     name = models.CharField(max_length=255, unique=True, blank=True, null=True)
     participants = models.ManyToManyField(User, related_name='chat_rooms')
-    is_private = models.BooleanField(default=False)  # True for private chats, False for group chats
+    is_private = models.BooleanField(default=False)  
 
     def __str__(self):
         return self.name if self.name else f"Private Chat ({self.id})"

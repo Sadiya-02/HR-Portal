@@ -32,36 +32,24 @@
         }
     </style>
 </head>
-<!-- <body>
-    <h2>Notifications</h2>
-    <ul>
-        {% for notification in notifications %}
-            <li {% if not notification.is_seen %} style="font-weight:bold;" {% endif %}>
-                {{ notification.message }} - {{ notification.created_at|date:"Y-m-d H:i" }}
-            </li>
-        {% empty %}
-            <li>No notifications yet.</li>
-        {% endfor %}
-    </ul>
-</body> -->
 <body>
     <div style="
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background-color:#f0f2f5;
-      padding: 10px 16px;
-      border-radius: 8px;
-      z-index: 1000;
-      ">
-      <a href="javascript:history.back()" style="
-          text-decoration: none;
-          color: black;
-          font-weight: bold;
-          font-size: 16px;
-      ">
-          &larr; Back
-      </a>
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color:#f0f2f5;
+        padding: 10px 16px;
+        border-radius: 8px;
+        z-index: 1000;
+        ">
+        <a href="javascript:history.back()" style="
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 16px;
+            ">
+            &larr; Back
+        </a>
     </div>
     <div class="container notification-list">
         <h2 class="mb-4">🔔 Notifications</h2>

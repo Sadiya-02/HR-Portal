@@ -1,0 +1,95 @@
+<!-- admin_view_messages.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submitted Contact Messages(home)</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 60px;
+        }
+
+        .custom-card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            
+        }
+
+        h2 {
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #0d6efd;
+            letter-spacing: 0.5px;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        .table thead {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .no-msg {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .card-header-icon {
+            font-size: 22px;
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Submitted Contact Messages</h2>
+
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Submitted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for msg in messages %}
+                    <tr>
+                        <td>{{ msg.name }}</td>
+                        <td>{{ msg.email }}</td>
+                        <td>{{ msg.phone }}</td>
+                        <td>{{ msg.message }}</td>
+                        <td>{{ msg.submitted_at }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No messages submitted yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

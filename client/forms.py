@@ -2,16 +2,16 @@ from django import forms
 from .models import ClientProject
 
 class ProjectForm(forms.ModelForm):
-    status = forms.ChoiceField(  # Explicitly declare (not just in Meta)
+    status = forms.ChoiceField(  
         choices=ClientProject.STATUS_CHOICES,
-        required=False  # Only if you allow blank status
+        required=False  
     )
 
     class Meta:
         model = ClientProject
-        fields = ['title', 'description', 'file', 'status']  # Include status
+        fields = ['title', 'description', 'file', 'status']  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not self.instance.pk:  # Hide for new projects
+        if not self.instance.pk:  
             self.fields.pop('status', None)

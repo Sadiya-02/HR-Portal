@@ -1,4 +1,3 @@
-<!-- handle_leave_request.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -133,7 +132,6 @@
     </style>
 </head>
 <body>
-    <!-- Your original Back button (unchanged) -->
     <div style="
       position: absolute;
       top: 20px;
@@ -148,16 +146,14 @@
           color: #ffffff;
           font-weight: bold;
           font-size: 16px;
-      ">
-          &larr; Back
+        ">
+        &larr; Back
       </a>
     </div>
 
-    <!-- Main centered container -->
     <div class="container">
         <div class="header">Leave Request Review</div>
-
-        <!-- Left panel: leave info -->
+        
         <div class="left-panel">
             <p><strong>Employee:</strong> {{ leave.employee.username }}</p>
             <p><strong>Start Date:</strong> {{ leave.start_date }}</p>
@@ -166,7 +162,6 @@
             <p><strong>Status:</strong> {{ leave.status }}</p>
         </div>
 
-        <!-- Right panel: rejection reason + actions -->
         <div class="right-panel">
             <form method="post">
                 {% csrf_token %}

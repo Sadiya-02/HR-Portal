@@ -1,14 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="form-container">
 <h2>Raise a Ticket</h2>
 <form method="post">
     {% csrf_token %}
-    <label for="id_subject">Project Name:</label><br>
-    {{ form.subject }}<br><br>
+    <div class="form-group">
+        <label for="id_subject">Project Name:</label>
+        {{ form.subject }}
+    </div><br>
 
-    <label for="id_description">Issue:</label><br>
-    {{ form.description }}<br><br>
+    <div class="form-group">
+        <label for="id_description">Issue:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        {{ form.description }}
+    </div></form><br>
 
     <button type="submit">Submit Ticket</button>
 </form>
+</div>
 {% endblock %}

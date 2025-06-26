@@ -16,9 +16,13 @@ from customadmin.models import Ticket, EmployeeSolution
 from customadmin.forms import EmployeeSolutionForm
 from .forms import LeaveRequestForm
 from .models import LeaveRequest
-from client.models import Notification
+from client.models import Notification,Client
 from .models import EmployeeNotification
-
+from datetime import date
+from django.utils.safestring import mark_safe
+import json
+from django.http import JsonResponse
+from customadmin.models import SalarySlip
 
 # Create your views here.
 def employee_login(request):
@@ -30,7 +34,7 @@ def employee_login(request):
 
         if user is not None:
             login(request, user)
-            return redirect('empdashboard')  # Update this with your dashboard URL name
+            return redirect('empdashboard') 
         else:
             messages.error(request, 'Invalid username or password.')
 
@@ -42,18 +46,19 @@ def index(request):
 @login_required
 def about(request):
     user = request.user
-    employee = Employee.objects.get(user=request.user)
-    return render(request, 'emp_index.html', {'employee': employee})
+    employee = Employee.objects.get(user=user)
+    pending_tasks = Task.objects.filter(assigned_to=user, completed=False).count()
+    new_projects = Project.objects.filter(assigned_to=employee).count()
+    client_count = Client.objects.count()
+    
 
+    return render(request, 'emp_index.html', {
+        'employee': employee,
+        'pending_tasks': pending_tasks,
+        'new_projects':new_projects,
+        'client_count': client_count,
+    })
 
-# def emp_index(request):
-#     return render(request, 'emp_index.html')# for redirect dashboard into dashboard
-
-# def emp_project(request):
-#     return render(request,'empproject.html')
-# def empprojects(request):
-#     projects = Project.objects.filter(assigned_to=request.user)
-#     return render(request, 'empproject.html', {'projects': projects})
 
 def empprojects(request):
     try:
@@ -83,9 +88,6 @@ def attendance(request):
 
 def salary(request):
     return render(request,'salary.html')
-
-def events(request):
-    return render(request,'events.html')
 
 def emp_todo(request):
     if request.method == 'POST':
@@ -131,15 +133,13 @@ def view_events(request):
 @login_required
 def check_in(request):
     today = timezone.now().date()
-    # today = datetime.now()
     formatted_date = today.strftime("%Y-%m-%d %H:%M:%S")
     existing = Attendance.objects.filter(user=request.user, date=today).first()
 
     if not existing:
         Attendance.objects.create(user=request.user, check_in=timezone.localtime(timezone.now()).time())
-        # Attendance.objects.create(user=request.user, date=today, check_in=timezone(pytz.timezone("Asia/Kolkata")))   
 
-    return redirect('emp_attendance')  # Or wherever you want
+    return redirect('emp_attendance')  
 
 @login_required
 def check_out(request):
@@ -149,7 +149,7 @@ def check_out(request):
     if attendance and not attendance.check_out:
         attendance.check_out = timezone.localtime(timezone.now()).time()
         attendance.save()
-    return redirect('emp_attendance')  # Or wherever you want
+    return redirect('emp_attendance')  
     
 @login_required
 def assigned_tickets(request):
@@ -161,7 +161,7 @@ def assigned_tickets(request):
 def solve_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, assigned_employee=request.user)
     
-    # Try to get the existing solution if already present
+    
     try:
         existing_solution = EmployeeSolution.objects.get(ticket=ticket)
     except EmployeeSolution.DoesNotExist:
@@ -191,27 +191,6 @@ def solve_ticket(request, ticket_id):
 
     return render(request, 'solve_ticketemp.html', {'form': form, 'ticket': ticket})
 
-
-# def leave_request_view(request):
-#     if request.method == 'POST':
-#         form = LeaveRequestForm(request.POST)
-#         if form.is_valid():
-#             leave = form.save(commit=False)
-#             leave.employee = request.user
-#             leave.save()
-
-#             admin_user = User.objects.filter(is_superuser=True).first()
-#             if admin_user:
-#                 EmployeeNotification.objects.create(
-#                     sender=request.user,
-#                     receiver=admin_user,
-#                     message=f"{request.user.username} submitted a leave request from {leave.start_date} to {leave.end_date}."
-#                 )
-#             return redirect('leave_request_success')  
-#         else:
-#             form = LeaveRequestForm()
-#         return render(request, 'leave_request_form.html', {'form': form})
-
 def leave_request_view(request):
     if request.method == 'POST':
         form = LeaveRequestForm(request.POST)
@@ -220,7 +199,7 @@ def leave_request_view(request):
             leave.employee = request.user
             leave.save()
 
-            # Notify admin
+            
             admin_user = User.objects.filter(is_superuser=True).first()
             if admin_user:
                 EmployeeNotification.objects.create(
@@ -229,11 +208,11 @@ def leave_request_view(request):
                     message=f"{request.user.username} submitted a leave request from {leave.start_date} to {leave.end_date}."
                 )
 
-            return redirect('leave_request_success')  # ✅ redirect after successful post
+            return redirect('leave_request_success')  
     else:
-        form = LeaveRequestForm()  # ✅ form for GET request
+        form = LeaveRequestForm()  
 
-    return render(request, 'leave_request_form.html', {'form': form})  # ✅ must return in all cases
+    return render(request, 'leave_request_form.html', {'form': form}) 
 
 def employee_leave_requests(request):
     requests = LeaveRequest.objects.filter(employee=request.user)
@@ -259,3 +238,17 @@ def my_tasks(request):
 def notification_page(request):
     notifications = EmployeeNotification.objects.filter(receiver=request.user).order_by('-created_at')
     return render(request, 'emp_notifications.html', {'notifications': notifications})
+
+def calendar_events(request):
+    events = []
+    for event in Event.objects.all():
+        events.append({
+            'title': event.title,
+            'start': event.date.strftime('%Y-%m-%d'),  
+        })
+    return JsonResponse(events, safe=False)
+
+@login_required
+def employee_salary_slips(request):
+    slips = SalarySlip.objects.filter(employee=request.user).order_by('-uploaded_at')
+    return render(request, 'salary.html', {'slips': slips})

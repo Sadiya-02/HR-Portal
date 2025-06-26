@@ -3,11 +3,10 @@ from .models import Client
 from .models import ClientProject, Notification
 
 
-# Register your models here.
+
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('user', 'company_name', 'company_description')
 
 admin.site.register(ClientProject)
 admin.site.register(Notification)
-# admin.site.register(Client)

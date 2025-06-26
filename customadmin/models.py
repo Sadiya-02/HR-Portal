@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
 
     
 class Todo(models.Model):
@@ -64,3 +63,21 @@ class Invoice(models.Model):
     def __str__(self):
         return self.title
 
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+class SalarySlip(models.Model):
+    employee = models.ForeignKey(User, on_delete=models.CASCADE)
+    month = models.CharField(max_length=20)
+    slip_file = models.FileField(upload_to='salary_slips/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.employee.username} - {self.month}"
